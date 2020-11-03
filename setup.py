@@ -15,6 +15,7 @@ setup(
     include_package_data=True,
     zip_safe=False,
     install_requires=[
-        'papermill>=2.2.0'
+        'future>=0.17.1',
+        'papermill>=2.2.0',
     ]
 )
