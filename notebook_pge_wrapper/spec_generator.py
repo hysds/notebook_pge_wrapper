@@ -91,6 +91,9 @@ class DockerBuildPGEParamsGenerator:
             if k.startswith('hysds_'):
                 continue
 
+            print(k)
+            print(p)
+            print("")
             param_type = p['inferred_type_name']
             description = p['help']
             default_value = p['default']
@@ -139,6 +142,12 @@ class DockerBuildPGEParamsGenerator:
             "submission_type":"individual",
             "params": [{...}]
         }
+        :param job_label: str, job label for hysds_io
+        :param sub_type: {iteration, individual}
+                         individual (1 job regardless of query)
+                         or iteration (N jobs for however many records recorded by the Elasticsesrch query)
+        :param nb_name: str, path + notebook name
+        :return: Dict[str, <any>]
         """
         if not sub_type:
             raise RuntimeError("sub_type (submission_type) required for hysdsio generation")
@@ -169,12 +178,12 @@ class DockerBuildPGEParamsGenerator:
             "time_limit": 86700,
             "params" : [...]
         }
-        :param time_limit:
-        :param soft_time_limit:
-        :param disk_usage:
-        :param required_queue:
-        :param nb_name:
-        :return:
+        :param time_limit: int
+        :param soft_time_limit: int
+        :param disk_usage: str (KB, MB, GB) ex. 10GB
+        :param required_queue: str or List[str]
+        :param nb_name: str
+        :return: Dict[str, <any>]
         """
         if required_queue is None:
             raise RuntimeError("required_queue not provided")

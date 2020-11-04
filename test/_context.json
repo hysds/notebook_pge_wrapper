@@ -1,0 +1,23 @@
+{
+  "_command": "/home/ops/lightweight-jobs/notify_by_email.sh",
+  "_disk_usage": "3GB",
+  "_prov": {
+    "wasGeneratedBy": "task_id:0610e26a-1345-4ded-9301-32de5187978e"
+  },
+  "component": "tosca",
+  "container_image_name": "container-hysds_lightweight-jobs:v1.0.5",
+  "container_image_url": "s3://us-####-#.######.com/####-####-####-###/container-hysds_lightweight-jobs:v1.0.5.tar.gz",
+  "container_mappings": {},
+  "container_specification": {
+    "digest": "sha256:d1d1b1a2c1a158041288754781c7d158fd8f1b237a2da83fec9630006fd9b198",
+    "id": "container-hysds_lightweight-jobs:v1.0.5",
+    "url": "s3://us-####-#.######.com/####-####-####-###/container-hysds_lightweight-jobs:v1.0.5.tar.gz",
+    "version": "v1.0.5"
+  },
+  "a": 1234567,
+  "b": "hello this is my test value for (b)",
+  "c": 123.123,
+  "d": [9,8,7,6,5,5,4,3,2,1],
+  "f": "test value for f",
+  "g": ["c", "b", "a"]
+}
