@@ -30,25 +30,37 @@ if __name__ == '__main__':
     # opened a Github issue to allow for inspection of notebook cell that's tagged with something else (not parameters)
     # https://github.com/nteract/papermill/issues/547
 
+    if not os.path.exists('docker'):
+        print('docker directory should already exist, please check your repo')
+        os.mkdir('docker')
+
     for nb in os.listdir(nb_directory):  # iterate through notebook_pges/ directory
+        if not nb.endswith('.ipynb'):
+            print('%s is not a notebook, skipping...' % nb)
+            continue
+
         nb_split = nb.split('.')
         root_name = nb_split[0]
-        print(nb, root_name)
+
+        nb_path = os.path.join('notebook_pges', nb)
 
         # generate hysds_io
         # copying hysds_io.json to docker/
-        hysdsio = docker_pge_generator.generate_hysdsio(nb_name=nb, sub_type=submission_type)
+        hysdsio = docker_pge_generator.generate_hysdsio(nb_name=nb_path,
+                                                        sub_type=submission_type)
         hysdsio_file = 'hysds-io.json.%s' % root_name
         hysdsio_file_location = os.path.join('docker', hysdsio_file)
 
-        with open(hysdsio_file_location, 'w') as f:
-            json.dump(hysdsio, f)
+        with open(hysdsio_file_location, 'w+') as f:
+            json.dump(hysdsio, f, indent=2)
+        print('generated %s' % hysdsio_file_location)
 
         # generate job_specs
         # copying job_specs.json to docker/
-        job_spec = docker_pge_generator.generate_job_spec(required_queue=required_queue)
+        job_spec = docker_pge_generator.generate_job_spec(nb_name=nb_path, required_queue=required_queue)
         job_spec_file = 'job-spec.json.%s' % root_name
         job_spec_file_location = os.path.join('docker', job_spec_file)
 
-        with open(job_spec_file_location, 'w') as f:
-            json.dump(job_spec, f)
+        with open(job_spec_file_location, 'w+') as f:
+            json.dump(job_spec, f, indent=2)
+        print('generated %s' % job_spec_file_location)

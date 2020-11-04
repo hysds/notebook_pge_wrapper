@@ -5,7 +5,7 @@
 * [container-builder (HySDS)](https://github.com/hysds/container-builder)
 
 ### Dependencies:
-* papermill>=2.2.0 (2.2.0 added `inspect_notebook`)
+* `papermill>=2.2.0` (2.2.0 added `inspect_notebook`)
 
 <p>
 The scripts here will help end users generate hysds-io.json and job-spec.json for Jupyter notebooks
