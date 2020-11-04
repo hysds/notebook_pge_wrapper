@@ -24,7 +24,7 @@ hysds_submission_type -> submission_type
 hysds_label -> label
 ```   
 Example:
-```
+```python
 from typing import List
 
 a = 100 # type: int
@@ -55,7 +55,7 @@ The scripts here will help end users generate hysds-io.json and job-spec.json fo
 The `main.py` script will iterate over all `.ipynb` files in your repo's `notebook_pges/` directory and generate a 
 `hysds_io` and `job_spec` and place it in `docker/`
 
-```
+```bash
 usage: main.py [-h] [--submission_type SUBMISSION_TYPE]
                [--required_queue REQUIRED_QUEUE]
 
@@ -183,7 +183,7 @@ HySDS spec `json` files
 
 ### Python Unit Tests
 Add unit test files under `test/`
-```
+```bash
 python -m unittest
 ```
 </p>
