@@ -31,7 +31,13 @@ optional arguments:
                         Elasticsesrch query)
   --required_queue REQUIRED_QUEUE
                         (REQUIRED) default queue required for job
-``` 
+```
+
+### Python Unit Tests
+Add unit test files under `test/`
+```
+python -m unittest
+```
 </p>
 
 
