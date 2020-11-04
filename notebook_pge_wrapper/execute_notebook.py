@@ -50,5 +50,5 @@ def execute_notebook(nb, ctx_file):
 
 
 if __name__ == '__main__':
-    nb = sys.argv[1]
-    execute_notebook(nb, '_context.json')
+    notebook = sys.argv[1]
+    execute_notebook(notebook, '_context.json')

@@ -1,27 +1,10 @@
 import os
 import json
-import argparse
 
-from notebook_pge_wrapper.nb_spec_generator import DockerBuildPGEParamsGenerator
+from notebook_pge_wrapper.spec_generator import DockerBuildPGEParamsGenerator
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Build hysds_io and job_spec json for all notebooks in notebook_pges/')
-    parser.add_argument('--submission_type', type=str, default='individual',
-                        help='individual (1 job regardless of query)'
-                             'or iteration (N jobs for however many records recorded by the Elasticsesrch query)')
-    parser.add_argument('--required_queue', type=str, help='(REQUIRED) default queue required for job')
-    args = parser.parse_args()
-    submission_type = args.submission_type or 'individual'
-    required_queue = args.required_queue or 'factotum-job_worker-small'
-
-    """
-    1. iterate through notebook_pges/ directory
-    2. for every .ipynb
-        2a. generate job_spec and hysds_io json file
-        2b. save them in the docker/ directory
-    """
-
     docker_pge_generator = DockerBuildPGEParamsGenerator()
     nb_directory = 'notebook_pges'
 
@@ -44,10 +27,19 @@ if __name__ == '__main__':
 
         nb_path = os.path.join('notebook_pges', nb)
 
+        # extracting hysds_io and job_specs from notebook
+        hysds_specs = docker_pge_generator.extract_hysds_specs(nb_path)
+
+        time_limit = hysds_specs.get('time_limit')
+        soft_time_limit = hysds_specs.get('soft_time_limit')
+        disk_usage = hysds_specs.get('disk_usage')
+        submission_type = hysds_specs.get('submission_type', 'individual')
+        required_queue = hysds_specs.get('required_queue', 'factotum-job_worker-small')
+        label = hysds_specs.get('label')
+
         # generate hysds_io
         # copying hysds_io.json to docker/
-        hysdsio = docker_pge_generator.generate_hysdsio(nb_name=nb_path,
-                                                        sub_type=submission_type)
+        hysdsio = docker_pge_generator.generate_hysdsio(nb_name=nb_path, sub_type=submission_type, job_label=label)
         hysdsio_file = 'hysds-io.json.%s' % root_name
         hysdsio_file_location = os.path.join('docker', hysdsio_file)
 
@@ -57,7 +49,9 @@ if __name__ == '__main__':
 
         # generate job_specs
         # copying job_specs.json to docker/
-        job_spec = docker_pge_generator.generate_job_spec(nb_name=nb_path, required_queue=required_queue)
+        job_spec = docker_pge_generator.generate_job_spec(nb_name=nb_path, soft_time_limit=soft_time_limit,
+                                                          time_limit=time_limit, required_queue=required_queue,
+                                                          disk_usage=disk_usage)
         job_spec_file = 'job-spec.json.%s' % root_name
         job_spec_file_location = os.path.join('docker', job_spec_file)
 

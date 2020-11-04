@@ -86,6 +86,9 @@ class DockerBuildPGEParamsGenerator:
         params = []
         
         for k, p in nb_params.items():
+            if k.startswith('hysds_'):
+                continue
+
             param_type = p['inferred_type_name']
             description = p['help']
             hysdsio_param = {
@@ -97,6 +100,19 @@ class DockerBuildPGEParamsGenerator:
                 hysdsio_param['description'] = description
             params.append(hysdsio_param)
         return params
+
+    @staticmethod
+    def extract_hysds_specs(nb_name):
+        nb_params = papermill.inspect_notebook(nb_name)
+
+        hysds_specs = {}
+        for k, p in nb_params.items():
+            if not k.startswith('hysds_'):
+                continue
+
+            k = k.replace('hysds_', '')
+            hysds_specs[k] = json.loads(p['default'])
+        return hysds_specs
 
     def generate_hysdsio(self, job_label=None, sub_type=None, nb_name=None):
         """
@@ -155,6 +171,9 @@ class DockerBuildPGEParamsGenerator:
         params = []
 
         for key in nb_params:
+            if key.startswith('hysds_'):
+                continue
+
             params.append({
                 'name': key,
                 'destination': 'context'
@@ -201,7 +220,6 @@ if __name__ == '__main__':
     submission_type_flag = args.submission_type if args.submission_type in {'individual', 'iteration'} else 'individual'
 
     docker_pge_generator = DockerBuildPGEParamsGenerator()
-
     hysdsio = docker_pge_generator.generate_hysdsio(job_label=label_flag, sub_type=submission_type_flag,
                                                     nb_name=notebook_flag)
     print('hysdsio json: %s\n' % json.dumps(hysdsio, indent=2))
