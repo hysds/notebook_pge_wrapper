@@ -1,5 +1,7 @@
-import argparse
 import json
+import traceback
+import argparse
+
 import papermill
 
 
@@ -91,6 +93,8 @@ class DockerBuildPGEParamsGenerator:
 
             param_type = p['inferred_type_name']
             description = p['help']
+            default_value = p['default']
+
             hysdsio_param = {
                 'name': k,
                 'from': 'submitter',
@@ -98,6 +102,13 @@ class DockerBuildPGEParamsGenerator:
             }
             if description:
                 hysdsio_param['description'] = description
+            if default_value:
+                try:
+                    hysdsio_param['default'] = json.loads(default_value)
+                except Exception as e:
+                    print(e)
+                    hysdsio_param['default'] = default_value
+
             params.append(hysdsio_param)
         return params
 
@@ -111,7 +122,13 @@ class DockerBuildPGEParamsGenerator:
                 continue
 
             k = k.replace('hysds_', '')
-            hysds_specs[k] = json.loads(p['default'])
+            default_value = p['default']
+            try:
+                hysds_specs[k] = json.loads(default_value)
+            except (json.JSONDecodeError, Exception) as e:
+                print(default_value, e)
+                traceback.print_exc()
+                p['default'] = default_value[1:-1]
         return hysds_specs
 
     def generate_hysdsio(self, job_label=None, sub_type=None, nb_name=None):
