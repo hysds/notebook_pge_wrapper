@@ -71,6 +71,116 @@ optional arguments:
                         (REQUIRED) default queue required for job
 ```
 
+HySDS spec `json` files
+
+`hysds-io.json`
+```json
+{
+  "submission_type": "iteration",
+  "params": [
+    {
+      "name": "a",
+      "from": "submitter",
+      "type": "number",
+      "default": 100
+    },
+    {
+      "name": "b",
+      "from": "submitter",
+      "type": "text",
+      "default": "jfksl"
+    },
+    {
+      "name": "c",
+      "from": "submitter",
+      "type": "number",
+      "default": 10.2553
+    },
+    {
+      "name": "d",
+      "from": "submitter",
+      "type": "list",
+      "default": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "name": "e",
+      "from": "submitter",
+      "type": "text",
+      "default": "['a', 'b', 'c']"
+    },
+    {
+      "name": "f",
+      "from": "submitter",
+      "type": "text",
+      "default": "fjskl"
+    },
+    {
+      "name": "g",
+      "from": "submitter",
+      "type": "text",
+      "default": [
+        "a",
+        "b",
+        "c"
+      ]
+    }
+  ],
+  "component": "tosca"
+}
+```
+
+`job_spec.json`
+```json
+{
+  "command": "python notebook_wrapper.py $HOME/notebook_pges/test.ipynb",
+  "time_limit": 57389,
+  "soft_time_limit": 4738,
+  "disk_usage": "10GB",
+  "required_queues": [
+    "factotum-job_worker-small"
+  ],
+  "imported_worker_files": {
+    "$HOME/.aws": "/home/ops/.aws"
+  },
+  "params": [
+    {
+      "name": "a",
+      "destination": "context"
+    },
+    {
+      "name": "b",
+      "destination": "context"
+    },
+    {
+      "name": "c",
+      "destination": "context"
+    },
+    {
+      "name": "d",
+      "destination": "context"
+    },
+    {
+      "name": "e",
+      "destination": "context"
+    },
+    {
+      "name": "f",
+      "destination": "context"
+    },
+    {
+      "name": "g",
+      "destination": "context"
+    }
+  ]
+}
+```
+
 ### Python Unit Tests
 Add unit test files under `test/`
 ```
