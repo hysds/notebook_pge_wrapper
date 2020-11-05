@@ -43,7 +43,7 @@ STDOUT_FILE = '_alt_info.txt'
 STDERR_FILE = '_alt_error.txt'
 
 
-def execute_notebook(nb, ctx_file):
+def execute(nb, ctx_file):
     ctx = read_context(ctx_file)
     params = build_notebook_params(nb, ctx)
 
@@ -57,4 +57,4 @@ def execute_notebook(nb, ctx_file):
 
 if __name__ == '__main__':
     notebook = sys.argv[1]
-    execute_notebook(notebook, '_context.json')
+    execute(notebook, '_context.json')
