@@ -6,7 +6,7 @@ import papermill
 logging.basicConfig(level='INFO', format="%(asctime)s %(message)s", datefmt='%Y-%m-%d %H:%M:%S')
 
 
-def create_nb_output_file_name(nb):
+def _create_nb_output_file_name(nb):
     nb_split = nb.split('.')
     output_nb = nb_split
     output_nb[0] += '-output'
@@ -15,7 +15,7 @@ def create_nb_output_file_name(nb):
     return output_nb
 
 
-def read_context(ctx_file):
+def _read_context(ctx_file):
     """
     reads _context.json file and returns dictionary arguments
     :param ctx_file:
@@ -26,7 +26,7 @@ def read_context(ctx_file):
         return ctx
 
 
-def build_notebook_params(nb, ctx):
+def _build_notebook_params(nb, ctx):
     nb_params = papermill.inspect_notebook(nb)
 
     params = {}
@@ -44,13 +44,13 @@ STDERR_FILE = '_alt_error.txt'
 
 
 def execute(nb, ctx_file):
-    ctx = read_context(ctx_file)
-    params = build_notebook_params(nb, ctx)
+    ctx = _read_context(ctx_file)
+    params = _build_notebook_params(nb, ctx)
 
     f_info = open(STDOUT_FILE, 'w+')
     f_err = open(STDERR_FILE, 'w+')
 
-    output_nb = create_nb_output_file_name(nb)
+    output_nb = _create_nb_output_file_name(nb)
     papermill.execute_notebook(nb, output_nb, parameters=params, log_output=True,
                                stdout_file=f_info, stderr_file=f_err)
 

@@ -1,10 +1,3 @@
-from __future__ import unicode_literals
-from __future__ import print_function
-from __future__ import division
-from __future__ import absolute_import
-from future import standard_library
-standard_library.install_aliases()
-
 from setuptools import setup, find_packages
 
 setup(
@@ -15,7 +8,6 @@ setup(
     include_package_data=True,
     zip_safe=False,
     install_requires=[
-        'future>=0.17.1',
         'papermill>=2.2.0',
     ]
 )

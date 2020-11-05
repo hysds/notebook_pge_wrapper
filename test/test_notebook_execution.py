@@ -1,7 +1,7 @@
 import os
 import unittest
 
-from notebook_pge_wrapper.execute_notebook import execute_notebook, create_nb_output_file_name
+from notebook_pge_wrapper.execute_notebook import execute
 
 
 class TestJobWorkerFuncs(unittest.TestCase):
@@ -21,12 +21,12 @@ class TestJobWorkerFuncs(unittest.TestCase):
         if os.path.exists(stderr_file):
             os.remove(stderr_file)
 
+        for nb in os.listdir(self.notebook_dir):
+            if nb.endswith('-output.ipynb'):
+                output_file = os.path.join(self.notebook_dir, nb)
+                os.remove(output_file)
+
     def test_notebook_execution(self):
         test_nb = os.path.join(self.notebook_dir, 'test.ipynb')
         test_context = os.path.join(self.current_directory, '_context.json')
-        execute_notebook(test_nb, test_context)
-
-        # clearing output notebook
-        output_nb = create_nb_output_file_name(test_nb)
-        if os.path.exists(output_nb):
-            os.remove(output_nb)
+        execute(test_nb, test_context)
