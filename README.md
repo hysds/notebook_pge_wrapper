@@ -25,6 +25,7 @@ hysds_label -> label
 ```   
 Example:
 ```python
+# parameters
 from typing import List
 
 a = 100 # type: int
@@ -55,21 +56,6 @@ The scripts here will help end users generate hysds-io.json and job-spec.json fo
 The `main.py` script will iterate over all `.ipynb` files in your repo's `notebook_pges/` directory and generate a 
 `hysds_io` and `job_spec` and place it in `docker/`
 
-```bash
-usage: main.py [-h] [--submission_type SUBMISSION_TYPE]
-               [--required_queue REQUIRED_QUEUE]
-
-Build hysds_io and job_spec json for all notebooks in notebook_pges/
-
-optional arguments:
-  -h, --help            show this help message and exit
-  --submission_type SUBMISSION_TYPE
-                        individual (1 job regardless of query)or iteration (N
-                        jobs for however many records recorded by the
-                        Elasticsesrch query)
-  --required_queue REQUIRED_QUEUE
-                        (REQUIRED) default queue required for job
-```
 
 HySDS spec `json` files
 

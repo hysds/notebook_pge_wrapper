@@ -91,9 +91,6 @@ class DockerBuildPGEParamsGenerator:
             if k.startswith('hysds_'):
                 continue
 
-            print(k)
-            print(p)
-            print("")
             param_type = p['inferred_type_name']
             description = p['help']
             default_value = p['default']

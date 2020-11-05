@@ -1,25 +1,9 @@
 import sys
-import traceback
 import json
-
+import logging
 import papermill
 
-
-def exec_wrapper(func):
-    """Execution wrapper to dump alternate errors and tracebacks."""
-
-    def wrapper(*args, **kwargs):
-        try:
-            # status = func(*args, **kwargs)
-            func(*args, **kwargs)
-        except (Exception, SystemExit) as e:
-            with open("_alt_error.txt", "w") as f:
-                f.write("%s\n" % str(e))
-            with open("_alt_traceback.txt", "w") as f:
-                f.write("%s\n" % traceback.format_exc())
-            raise
-        # sys.exit(status)  # this breaks with papermill.execute
-    return wrapper
+logging.basicConfig(level='INFO', format="%(asctime)s %(message)s", datefmt='%Y-%m-%d %H:%M:%S')
 
 
 def create_nb_output_file_name(nb):
@@ -50,19 +34,25 @@ def build_notebook_params(nb, ctx):
         if k.startswith('hysds_'):
             continue
 
-        # if key is found in _context.json then populate params dict with value
-        if ctx.get(k) is not None:
+        if ctx.get(k) is not None:  # if key is found in _context.json then populate params dict with value
             params[k] = ctx[k]
     return params
 
 
-@exec_wrapper
+STDOUT_FILE = '_alt_info.txt'
+STDERR_FILE = '_alt_error.txt'
+
+
 def execute_notebook(nb, ctx_file):
     ctx = read_context(ctx_file)
     params = build_notebook_params(nb, ctx)
 
+    f_info = open(STDOUT_FILE, 'w+')
+    f_err = open(STDERR_FILE, 'w+')
+
     output_nb = create_nb_output_file_name(nb)
-    papermill.execute_notebook(nb, output_nb, parameters=params, log_output=True)
+    papermill.execute_notebook(nb, output_nb, parameters=params, log_output=True,
+                               stdout_file=f_info, stderr_file=f_err)
 
 
 if __name__ == '__main__':
