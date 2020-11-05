@@ -1,3 +1,7 @@
+# hysds specific
+_alt_error.txt
+_alt_traceback.txt
+
 # General
 .DS_Store
 .AppleDouble
