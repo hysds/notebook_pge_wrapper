@@ -203,7 +203,7 @@ class DockerBuildPGEParamsGenerator:
             })
 
         output_job_spec = {
-            'command': 'python notebook_wrapper.py $HOME/%s' % nb_name,
+            'command': 'python execute_notebook.py $HOME/%s' % nb_name,
             'time_limit': time_limit,
             'soft_time_limit': soft_time_limit,
             'disk_usage': disk_usage,

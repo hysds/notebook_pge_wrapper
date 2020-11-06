@@ -1,9 +1,25 @@
 import sys
 import json
 import logging
+import traceback
+
 import papermill
 
-logging.basicConfig(level='INFO', format="%(asctime)s %(message)s", datefmt='%Y-%m-%d %H:%M:%S')
+logging.basicConfig(level='INFO', format="%(asctime)s [%(levelname)s] %(message)s", datefmt='%Y-%m-%d %H:%M:%S')
+
+
+def exec_wrapper(func):
+    """Execution wrapper to dump alternate errors and tracebacks."""
+    def wrapper(*args, **kwargs):
+        try:
+            func(*args, **kwargs)
+        except (Exception, SystemExit) as e:
+            with open("_alt_error.txt", "w") as f:
+                f.write("%s\n" % str(e))
+            with open("_alt_traceback.txt", "w") as f:
+                f.write("%s\n" % traceback.format_exc())
+            raise
+    return wrapper
 
 
 def _create_nb_output_file_name(nb):
@@ -18,7 +34,7 @@ def _create_nb_output_file_name(nb):
 def _read_context(ctx_file):
     """
     reads _context.json file and returns dictionary arguments
-    :param ctx_file:
+    :param ctx_file: str, location of _context.json
     :return: dict[Str, <any>]
     """
     with open(ctx_file, 'r') as f:
@@ -39,20 +55,15 @@ def _build_notebook_params(nb, ctx):
     return params
 
 
-STDOUT_FILE = '_alt_info.txt'
-STDERR_FILE = '_alt_error.txt'
-
-
+@exec_wrapper
 def execute(nb, ctx_file):
     ctx = _read_context(ctx_file)
     params = _build_notebook_params(nb, ctx)
 
-    f_info = open(STDOUT_FILE, 'w+')
-    f_err = open(STDERR_FILE, 'w+')
+    f_info = open('_alt_info.txt', 'w')
 
     output_nb = _create_nb_output_file_name(nb)
-    papermill.execute_notebook(nb, output_nb, parameters=params, log_output=True,
-                               stdout_file=f_info, stderr_file=f_err)
+    papermill.execute_notebook(nb, output_nb, parameters=params, log_output=True, stdout_file=f_info)
 
 
 if __name__ == '__main__':
