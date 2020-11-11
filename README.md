@@ -17,7 +17,7 @@ pip install -e .
 * `create` - generates a base skeleton project for end-users to develop notebook PGEs
 * `specs` - takes a `-n <path to notebook>` argument and generates a `hysdsio` and `job_spec` json file in the `docker/` directory
 ```bash
-notebook-pge-wrapper --help
+$ notebook-pge-wrapper --help
 Usage: notebook-pge-wrapper [OPTIONS] COMMAND [ARGS]...
 
   A CLI wrapper for notebook_pge_wrapper
@@ -26,8 +26,8 @@ Options:
   --help  Show this message and exit.
 
 Commands:
-  create  Creates the project root directory: $ notebook-pge-wrapper create...
-  specs   Generates the hysdsio and job specs for json files (saved in the...
+  create  Creates the project root directory: <project_root> ├── README.md...
+  specs   Generates the hysdsio and job specs for json files (in the docker...
 ```
 
 ### Generating a base Notebook PGE project
@@ -89,8 +89,26 @@ The scripts here will help end users generate hysds-io.json and job-spec.json fo
 * `generate_hysdsio` to generate `hysds-io.json.*`
 * `generate_job_spec` to generate `job-spec.json.*`
 
+
 The `main.py` script will iterate over all `.ipynb` files in your repo's `notebook_pges/` directory and generate a 
 `hysds_io` and `job_spec` and place it in `docker/`
+
+Or you can use the `notebook-pge-wrapper` cli to generate the spec files
+* `notebook-pge-wrapper specs all` to iterate generate spec files for all notebooks in `notebook_pges/`
+* `notebook-pge-wrapper specs <notebook path>` to generate spec files for a notebook
+```bash
+$ notebook-pge-wrapper specs --help
+Usage: notebook-pge-wrapper specs [OPTIONS] NOTEBOOK_PATH
+
+  Generates the hysdsio and job specs for json files (in the docker
+  directory) for a notebook
+
+  enter "all" to generate all spec files in notebook_pges/
+
+  ie. notebook-pge-wrapper specs <notebook_path or all>
+
+  :param notebook_path: str :return: None
+```
 
 
 HySDS spec `json` files

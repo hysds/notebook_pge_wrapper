@@ -2,9 +2,7 @@ import os
 from shutil import copyfile
 import click
 
-import json
-
-from notebook_pge_wrapper.spec_generator import generate_job_spec, generate_hysdsio, extract_hysds_specs
+from notebook_pge_wrapper.spec_generator import generate_spec_files
 # from notebook_pge_wrapper.execute_notebook import execute
 
 
@@ -23,17 +21,19 @@ def cli():
 @click.argument('project')
 def create(project):
     """
-    Creates the project root directory:
-    $ notebook-pge-wrapper create <project_root>
-    <project_root>
-    ├── README.md
-    ├── docker/
-    │   └── Dockerfile
-    └── notebook_pges/
+    Creates the project root directory:\n
+    <project_root>\n
+    ├── README.md\n
+    ├── docker/\n
+    │   └── Dockerfile\n
+    └── notebook_pges/\n
 
     :param project: str: CLI argument
     :return: None
     """
+    if not project:
+        raise RuntimeError("project must be supplied, ie. notebook-pge-wrapper create <project_root>")
+
     project_root = os.path.dirname(os.path.abspath(__file__))
 
     docker_directory = os.path.join(project, __DOCKER_DIR)
@@ -62,49 +62,28 @@ def create(project):
 
 
 @cli.command()
-@click.option('--notebook', '-n', 'notebook_path', help='number of greetings')
+@click.argument('notebook_path')
 def specs(notebook_path):
     """
-    Generates the hysdsio and job specs for json files (saved in the docker directory) for a notebook
+    Generates the hysdsio and job specs for json files (in the docker directory) for a notebook \n
+    enter "all" to generate all spec files in notebook_pges/ \n
+    ie. notebook-pge-wrapper specs <notebook_path or all>
+
     :param notebook_path: str
     :return: None
     """
-    if notebook_path is None:
-        raise RuntimeError("notebook argument (--notebook or -n) must be supplied")
+    if notebook_path == "all":
+        for nb in os.listdir('notebook_pges'):  # iterate through notebook_pges/ directory
+            if not nb.endswith('.ipynb'):
+                print('%s is not a notebook, skipping...' % nb)
+                continue
+            print('inspecting notebook: %s' % nb)
+            generate_spec_files(nb)
+    else:
+        if not os.path.isfile(notebook_path):
+            raise RuntimeError("notebook %s not found" % notebook_path)
 
-    if not os.path.isfile(notebook_path):
-        raise RuntimeError("notebook %s not found" % notebook_path)
-
-    notebook = notebook_path.split('/')
-    notebook = notebook[1]
-
-    nb_split = notebook.split('.')
-    root_name = nb_split[0]
-
-    hysds_specs = extract_hysds_specs(notebook_path)
-    time_limit = hysds_specs.get('time_limit')
-    soft_time_limit = hysds_specs.get('soft_time_limit')
-    disk_usage = hysds_specs.get('disk_usage')
-    submission_type = hysds_specs.get('submission_type', 'individual')
-    required_queue = hysds_specs.get('required_queue', 'factotum-job_worker-small')
-    label = hysds_specs.get('label')
-
-    # generate hysds_io
-    hysdsio = generate_hysdsio(nb_name=notebook_path, sub_type=submission_type, job_label=label)
-    hysdsio_file = 'hysds-io.json.%s' % root_name
-    hysdsio_file_location = os.path.join('docker', hysdsio_file)
-
-    with open(hysdsio_file_location, 'w+') as f:
-        json.dump(hysdsio, f, indent=2)
-    print('generated %s' % hysdsio_file_location)
-
-    job_spec = generate_job_spec(nb_name=notebook_path, soft_time_limit=soft_time_limit, time_limit=time_limit,
-                                 required_queue=required_queue, disk_usage=disk_usage)
-    job_spec_file = 'job-spec.json.%s' % root_name
-    job_spec_file_location = os.path.join('docker', job_spec_file)
-
-    with open(job_spec_file_location, 'w+') as f:
-        json.dump(job_spec, f, indent=2)
-    print('generated %s' % job_spec_file_location)
-
-
+        nb = notebook_path.split('/')
+        nb = nb[1]
+        print('inspecting notebook: %s' % nb)
+        generate_spec_files(nb)

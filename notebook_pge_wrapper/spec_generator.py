@@ -1,3 +1,4 @@
+import os
 import json
 import traceback
 import argparse
@@ -166,7 +167,7 @@ def generate_hysdsio(job_label=None, sub_type=None, nb_name=None):
 
 
 def generate_job_spec(time_limit=__DEFAULT_TIME_LIMIT, soft_time_limit=__DEFAULT_SOFT_TIME_LIMIT,
-                      disk_usage=__DEFAULT_DISK_USAGE, required_queue=None, nb_name=None):
+                      disk_usage=__DEFAULT_DISK_USAGE, required_queue=None, nb=None):
     """
     example: {
         "required_queues":["system-jobs-queue"],
@@ -180,19 +181,21 @@ def generate_job_spec(time_limit=__DEFAULT_TIME_LIMIT, soft_time_limit=__DEFAULT
     :param soft_time_limit: int
     :param disk_usage: str (KB, MB, GB) ex. 10GB
     :param required_queue: str or List[str]
-    :param nb_name: str
+    :param nb: str, path of Jupyter notebook
     :return: Dict[str, <any>]
     """
     if required_queue is None:
         raise RuntimeError("required_queue not provided")
-    if not nb_name:
+    if not nb:
         raise RuntimeError("Jupyter notebook not supplied")
 
     if isinstance(required_queue, str):
         required_queue = [required_queue]
 
-    nb_params = papermill.inspect_notebook(nb_name)
+    nb_params = papermill.inspect_notebook(nb)
     params = []
+
+    nb_root = nb.split('/')[-1]  # get root notebook name
 
     for key in nb_params:
         if key.startswith('hysds_'):
@@ -204,7 +207,7 @@ def generate_job_spec(time_limit=__DEFAULT_TIME_LIMIT, soft_time_limit=__DEFAULT
         })
 
     output_job_spec = {
-        'command': 'python execute_notebook.py $HOME/%s' % nb_name,
+        'command': 'python execute_notebook.py $HOME/notebook_pges/%s' % nb_root,
         'time_limit': time_limit,
         'soft_time_limit': soft_time_limit,
         'disk_usage': disk_usage,
@@ -215,6 +218,42 @@ def generate_job_spec(time_limit=__DEFAULT_TIME_LIMIT, soft_time_limit=__DEFAULT
         'params': params
     }
     return output_job_spec
+
+
+def generate_spec_files(nb):
+    nb_split = nb.split('.')
+    root_name = nb_split[0]
+
+    nb_path = os.path.join('notebook_pges', nb)
+
+    # extracting hysds_io and job_specs from notebook
+    hysds_specs = extract_hysds_specs(nb_path)
+
+    time_limit = hysds_specs.get('time_limit')
+    soft_time_limit = hysds_specs.get('soft_time_limit')
+    disk_usage = hysds_specs.get('disk_usage')
+    submission_type = hysds_specs.get('submission_type', 'individual')
+    required_queue = hysds_specs.get('required_queue', 'factotum-job_worker-small')
+    label = hysds_specs.get('label')
+
+    # generate hysds_io, copying hysds_io.json to docker/
+    hysdsio = generate_hysdsio(nb_name=nb_path, sub_type=submission_type, job_label=label)
+    hysdsio_file = 'hysds-io.json.%s' % root_name
+    hysdsio_file_location = os.path.join('docker', hysdsio_file)
+
+    with open(hysdsio_file_location, 'w+') as f:
+        json.dump(hysdsio, f, indent=2)
+    print('generated %s' % hysdsio_file_location)
+
+    # generate job_specs, copying job_specs.json to docker/
+    job_spec = generate_job_spec(nb=nb_path, soft_time_limit=soft_time_limit, time_limit=time_limit,
+                                 required_queue=required_queue, disk_usage=disk_usage)
+    job_spec_file = 'job-spec.json.%s' % root_name
+    job_spec_file_location = os.path.join('docker', job_spec_file)
+
+    with open(job_spec_file_location, 'w+') as f:
+        json.dump(job_spec, f, indent=2)
+    print('generated %s' % job_spec_file_location)
 
 
 if __name__ == '__main__':
@@ -247,6 +286,7 @@ if __name__ == '__main__':
     hysdsio = generate_hysdsio(job_label=label_flag, sub_type=submission_type_flag, nb_name=notebook_flag)
     print('hysdsio json: %s\n' % json.dumps(hysdsio, indent=2))
 
-    job_spec = generate_job_spec(time_limit=time_limit_flag, soft_time_limit=soft_time_limit_flag,
-                                 disk_usage=disk_usage_flag, required_queue=required_queue_flag, nb_name=notebook_flag)
-    print('job_spec json: %s\n' % json.dumps(job_spec, indent=2))
+    job_specification = generate_job_spec(time_limit=time_limit_flag, soft_time_limit=soft_time_limit_flag,
+                                          disk_usage=disk_usage_flag, required_queue=required_queue_flag,
+                                          nb=notebook_flag)
+    print('job_spec json: %s\n' % json.dumps(job_specification, indent=2))

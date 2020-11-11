@@ -7,7 +7,7 @@ from notebook_pge_wrapper.execute_notebook import execute
 class TestJobWorkerFuncs(unittest.TestCase):
     def setUp(self):
         self.current_directory = os.path.dirname(os.path.abspath(__file__))
-        self.notebook_dir = os.path.join(self.current_directory, "notebooks")
+        self.notebook_dir = os.path.join(self.current_directory, "notebook_pges")
 
         self.stdout_file = '_alt_info.txt'
         self.stderr_file = '_alt_error.txt'

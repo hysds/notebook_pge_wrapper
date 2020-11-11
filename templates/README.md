@@ -58,5 +58,19 @@ hysds_required_queue = "test_queue-worker"
 hysds_label = "TEST LABEL FOR HYSDS_IOS"
 ``` 
 
-The `main.py` script will iterate over all `.ipynb` files in your repo's `notebook_pges/` directory and generate a 
-`hysds_io` and `job_spec` and place it in `docker/`
+Use the `notebook-pge-wrapper` cli to generate the spec files
+* `notebook-pge-wrapper specs all` to iterate generate spec files for all notebooks in `notebook_pges/`
+* `notebook-pge-wrapper specs <notebook path>` to generate spec files for a notebook
+```bash
+$ notebook-pge-wrapper specs --help
+Usage: notebook-pge-wrapper specs [OPTIONS] NOTEBOOK_PATH
+
+  Generates the hysdsio and job specs for json files (in the docker
+  directory) for a notebook
+
+  enter "all" to generate all spec files in notebook_pges/
+
+  ie. notebook-pge-wrapper specs <notebook_path or all>
+
+  :param notebook_path: str :return: None
+```
