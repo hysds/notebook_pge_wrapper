@@ -1,2 +1,2 @@
-from .spec_generator import DockerBuildPGEParamsGenerator
+from notebook_pge_wrapper.spec_generator import generate_job_spec, generate_hysdsio, extract_hysds_specs
 from .execute_notebook import execute

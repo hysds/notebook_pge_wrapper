@@ -7,7 +7,13 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     zip_safe=False,
+    entry_points={
+        'console_scripts': [
+            'notebook-pge-wrapper = notebook_pge_wrapper.cli:cli'
+        ]
+    },
     install_requires=[
+        'click>=7.1.2',
         'papermill>=2.2.0',
     ]
 )
