@@ -7,8 +7,8 @@ ENV CONDA_DIR=/opt/conda \
     LANG=en_US.UTF-8 \
     LANGUAGE=en_US.UTF-8
 
-ENV PATH=$CONDA_DIR/bin:$PATH \
-	HOME=/home/$NB_USER
+ENV PATH=$CONDA_DIR/bin:$PATH
+#	HOME=/home/$NB_USER
 
 RUN yum -y update \
 	&& yum -y install curl bzip2 git \

@@ -49,7 +49,7 @@ __TEXT_AREA = 'textarea'
 __LIST = 'list'
 __DICT = 'dict'
 
-MAPPER = {
+__MAPPER = {
     'str': __TEXT,
     'string': __TEXT,
     'text': __TEXT,
@@ -75,13 +75,13 @@ MAPPER = {
 
 def __get_hysdsio_param_type(t):
     """
-    maps input to hysdsio type (using MAPPER)
+    maps input to hysdsio type (using __MAPPER)
     :param t: str
     :return: str
     """
     # TODO: may need to include List and Dict type, maybe use str.startswith()?
     t_lower = t.lower()
-    return MAPPER.get(t_lower, __TEXT)
+    return __MAPPER.get(t_lower, __TEXT)
 
 
 def __generate_hysdsio_params(nb_name):  # private method
