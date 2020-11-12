@@ -16,7 +16,7 @@ RUN yum -y update \
 	&& bash /tmp/miniconda.sh -bfp $CONDA_DIR \
 	&& rm -rf /tmp/miniconda.sh \
 	&& conda install -y python=3 \
-	&& conda install nb_conda_kernels \
+	&& conda install -y nb_conda_kernels \
 	&& conda update conda
 
 RUN git clone https://github.com/hysds/notebook_pge_wrapper.git
