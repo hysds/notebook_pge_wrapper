@@ -62,8 +62,10 @@ def execute(nb, ctx_file):
 
     f_info = open('_alt_info.txt', 'w')
 
+    # TODO: propogate soft_time_limit in execute_notebook()
     output_nb = _create_nb_output_file_name(nb)
-    papermill.execute_notebook(nb, output_nb, parameters=params, log_output=True, stdout_file=f_info)
+    papermill.execute_notebook(nb, output_nb, parameters=params, log_output=True, stdout_file=f_info,
+                               start_timeout=ctx.get('soft_time_limit', 3600))
 
 
 if __name__ == '__main__':
