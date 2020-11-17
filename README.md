@@ -1,15 +1,15 @@
 # Notebook PGE Wrapper
 
-### Related projects:
+## Related projects:
 * [Papermill Project](https://github.com/nteract/papermill)
 * [container-builder (HySDS)](https://github.com/hysds/container-builder)
 
-### Dependencies:
+## Dependencies:
 * Python 3
 * `click>=7.1.2`
 * `papermill>=2.2.0` (`2.2.0` added `inspect_notebook`)
 
-### Installation
+## Installation
 ```bash
 cd notebook_pge_wrapper
 pip install -e .
@@ -35,7 +35,7 @@ Commands:
            docker...
 ```
 
-### Generating a base Notebook PGE project
+## Generating a base Notebook PGE project
 ```bash
 $ notebook-pge-wrapper create <project_name>
 ```
@@ -47,8 +47,12 @@ The following project structure will be generated
 │   └── Dockerfile
 └── notebook_pges/
 ```
+* `Dockerfile` will go through [container-builder](https://github.com/hysds/container-builder) to build the docker image
+    * Will later be used to execute the notebook in a PGE setting
+* `notebook_pges/` is where all the Jupyter notebooks will be saved 
 
-### HySDS job specs generation
+
+## HySDS job specs generation
 * Tag the top notebook cell with `parameters`
 * prepend any hysds specification fields with `hysds_` and `extract_hysds_specs` will populate `hysds-io` and 
 `job_specs` with it's specified values
@@ -226,7 +230,7 @@ HySDS spec `json` files
 }
 ```
 
-### Notebook execution
+## Notebook execution
 `notebook-pge-wrapper` has a `execute` sub-command for notebook execution
 * Optional `--context` flag for the path to `_context.json` but will default to the current directory if not provided 
 
@@ -243,7 +247,7 @@ Options:
   --help          Show this message and exit.
 ```
 
-### Python Unit Tests
+## Python Unit Tests
 Add unit test files under `test/`
 ```bash
 python -m unittest
@@ -251,7 +255,7 @@ python -m unittest
 </p>
 
 
-### Related issues:
+## Related issues:
 * `hysds_io` and `job_specs` has values that are needed for job specification on execution
     * [Open Github issue (Papermill)](https://github.com/nteract/papermill/issues/547)
     * If the notebook can have a cell tagged with `specifications` we can re-use the existing functionality in
