@@ -68,7 +68,7 @@ def specs(notebook_path):
     enter "all" to generate all spec files in notebook_pges/ \n
     ie. notebook-pge-wrapper specs <notebook_path or all>
 
-    :param notebook_path: str, path to the .ipynb file
+    :param notebook_path: path to the .ipynb file
     """
     if notebook_path == "all":
         for nb in os.listdir('notebook_pges'):  # iterate through notebook_pges/ directory
@@ -94,7 +94,7 @@ def execute(notebook_path, context=None):
     """
     Execute a .ipynb notebook
     :param notebook_path: path to the .ipynb file
-    :param context: path for _context.json file
+    :param context: path to the _context.json file
     """
     if not notebook_path.endswith('.ipynb'):
         raise RuntimeError('%s is not a .ipynb file' % notebook_path)
