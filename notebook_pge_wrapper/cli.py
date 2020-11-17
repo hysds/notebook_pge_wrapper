@@ -3,7 +3,7 @@ from shutil import copyfile
 import click
 
 from notebook_pge_wrapper.spec_generator import generate_spec_files
-# from notebook_pge_wrapper.execute_notebook import execute
+from notebook_pge_wrapper.execute_notebook import execute as execute_notebook
 
 
 __NOTEBOOK_DIR = 'notebook_pges'
@@ -26,10 +26,9 @@ def create(project):
     ├── README.md\n
     ├── docker/\n
     │   └── Dockerfile\n
-    └── notebook_pges/\n
+    └── notebook_pges/
 
-    :param project: str: CLI argument
-    :return: None
+    :param project: New notebook project name (or path)
     """
     if not project:
         raise RuntimeError("project must be supplied, ie. notebook-pge-wrapper create <project_root>")
@@ -69,8 +68,7 @@ def specs(notebook_path):
     enter "all" to generate all spec files in notebook_pges/ \n
     ie. notebook-pge-wrapper specs <notebook_path or all>
 
-    :param notebook_path: str
-    :return: None
+    :param notebook_path: path to the .ipynb file
     """
     if notebook_path == "all":
         for nb in os.listdir('notebook_pges'):  # iterate through notebook_pges/ directory
@@ -87,3 +85,20 @@ def specs(notebook_path):
         nb = nb[1]
         print('inspecting notebook: %s' % nb)
         generate_spec_files(nb)
+
+
+@cli.command()
+@click.argument('notebook_path')
+@click.option('--context', 'context')
+def execute(notebook_path, context=None):
+    """
+    Execute a .ipynb notebook
+    :param notebook_path: path to the .ipynb file
+    :param context: path to the _context.json file, default to _context.json in current directory if not supplied
+    """
+    if not notebook_path.endswith('.ipynb'):
+        raise RuntimeError('%s is not a .ipynb file' % notebook_path)
+
+    if context is None:
+        context = '_context.json'
+    execute_notebook(notebook_path, context)

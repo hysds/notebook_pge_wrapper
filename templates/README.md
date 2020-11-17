@@ -12,16 +12,21 @@ The following project structure will be generated
 │   └── Dockerfile
 └── notebook_pges/
 ```
-Place all your `.ipynb` files in `notebook_pges/`
+* `Dockerfile` will go through [container-builder](https://github.com/hysds/container-builder) to build the docker image
+    * Will later be used to execute the notebook in a PGE setting
+* Place all your `.ipynb` files in `notebook_pges/`
 
 ### Papermill
 Your notebooks will leverage `papermill` to execute notebooks
 * [Papermill Project](https://papermill.readthedocs.io/en/latest/)
 * [Papermill parameters documentation](https://papermill.readthedocs.io/en/latest/usage-parameterize.html)
+* Can set parameter types 2 ways
+    * Adding a comment, ie. `x = 34  # type: int`
+    * [Python type hinting](https://docs.python.org/3/library/typing.html) (introduced in python 3.5)
 
 ### HySDS job specs generation
 * Tag the top notebook cell with `parameters`
-    * To add tags in your notebook, go to `View` -> `Cell Toolbar` -> `Tags`
+    * To add tags in your notebook, go to the toolbar: `View` -> `Cell Toolbar` -> `Tags`
 * prepend any hysds specification fields with `hysds_` and `extract_hysds_specs` will populate `hysds-io` and 
 `job_specs` with it's specified values
     * If not found it will set to `default` values (ie. `time_limit: 3600`)
