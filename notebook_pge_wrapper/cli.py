@@ -94,7 +94,7 @@ def execute(notebook_path, context=None):
     """
     Execute a .ipynb notebook
     :param notebook_path: path to the .ipynb file
-    :param context: path to the _context.json file
+    :param context: path to the _context.json file, default to _context.json in current directory if not supplied
     """
     if not notebook_path.endswith('.ipynb'):
         raise RuntimeError('%s is not a .ipynb file' % notebook_path)
