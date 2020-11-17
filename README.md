@@ -5,7 +5,9 @@
 * [container-builder (HySDS)](https://github.com/hysds/container-builder)
 
 ### Dependencies:
-* `papermill>=2.2.0` (2.2.0 added `inspect_notebook`)
+* Python 3
+* `click>=7.1.2`
+* `papermill>=2.2.0` (`2.2.0` added `inspect_notebook`)
 
 ### Installation
 ```bash
@@ -13,9 +15,10 @@ cd notebook_pge_wrapper
 pip install -e .
 ```
 
-`notebook-pge-wrapper` will have 2 main sub-commands
+`notebook-pge-wrapper` will have 3 main sub-commands
 * `create` - generates a base skeleton project for end-users to develop notebook PGEs
 * `specs` - takes a `-n <path to notebook>` argument and generates a `hysdsio` and `job_spec` json file in the `docker/` directory
+* `execute` for notebook execution
 ```bash
 $ notebook-pge-wrapper --help
 Usage: notebook-pge-wrapper [OPTIONS] COMMAND [ARGS]...
@@ -26,8 +29,10 @@ Options:
   --help  Show this message and exit.
 
 Commands:
-  create  Creates the project root directory: <project_root> ├── README.md...
-  specs   Generates the hysdsio and job specs for json files (in the docker...
+  create   Creates the project root directory: <project_root> ├── README.md...
+  execute  Execute a .ipynb notebook :param notebook_path: path to the...
+  specs    Generates the hysdsio and job specs for json files (in the
+           docker...
 ```
 
 ### Generating a base Notebook PGE project
@@ -219,6 +224,23 @@ HySDS spec `json` files
     }
   ]
 }
+```
+
+### Notebook execution
+`notebook-pge-wrapper` has a `execute` sub-command for notebook execution
+* Optional `--context` flag for the path to `_context.json` but will default to the current directory if not provided 
+
+```bash
+$ notebook-pge-wrapper execute --help
+Usage: notebook-pge-wrapper execute [OPTIONS] NOTEBOOK_PATH
+
+  Execute a .ipynb notebook :param notebook_path: path to the .ipynb file
+  :param context: path to the _context.json file, default to _context.json
+  in current directory if not supplied
+
+Options:
+  --context TEXT
+  --help          Show this message and exit.
 ```
 
 ### Python Unit Tests
