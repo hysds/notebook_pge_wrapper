@@ -22,10 +22,10 @@ def cli():
 def create(project):
     """
     Creates the project root directory:\n
-    <project_root>
-    ├── README.md
-    ├── docker/
-    │   └── Dockerfile
+    <project_root>\n
+    ├── README.md\n
+    ├── docker/\n
+    │   └── Dockerfile\n
     └── notebook_pges/
 
     :param project: New notebook project name (or path)
