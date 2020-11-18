@@ -23,7 +23,8 @@ def exec_wrapper(func):
 
 
 def _create_nb_output_file_name(nb):
-    nb_split = nb.split('.')
+    nb_root = nb.split('/')[-1]
+    nb_split = nb_root.split('.')
     output_nb = nb_split
     output_nb[0] += '-output'
     output_nb[1] = '.' + output_nb[1]
@@ -49,23 +50,27 @@ def _build_notebook_params(nb, ctx):
     for k, p in nb_params.items():
         if k.startswith('hysds_'):
             continue
-
         if ctx.get(k) is not None:  # if key is found in _context.json then populate params dict with value
             params[k] = ctx[k]
     return params
 
 
 @exec_wrapper
-def execute(nb, ctx_file):
+def execute(nb, out_nb=None, ctx_file=None):
+    if ctx_file is None:
+        raise RuntimeError("ctx_file must be supplied")
+
     ctx = _read_context(ctx_file)
     params = _build_notebook_params(nb, ctx)
+    time_limit = ctx.get('soft_time_limit', 3600)
 
     f_info = open('_alt_info.txt', 'w')
 
-    # TODO: propogate soft_time_limit in execute_notebook()
-    output_nb = _create_nb_output_file_name(nb)
-    papermill.execute_notebook(nb, output_nb, parameters=params, log_output=True, stdout_file=f_info,
-                               start_timeout=ctx.get('soft_time_limit', 3600))
+    if out_nb is None:
+        out_nb = _create_nb_output_file_name(nb)
+
+    papermill.execute_notebook(nb, out_nb, parameters=params, log_output=True, stdout_file=f_info,
+                               start_timeout=time_limit)
 
 
 if __name__ == '__main__':

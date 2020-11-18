@@ -12,13 +12,17 @@
 ## Installation
 ```bash
 cd notebook_pge_wrapper
+
 pip install -e .
+# or
+python setup.py install
 ```
 
 `notebook-pge-wrapper` will have 3 main sub-commands
 * `create` - generates a base skeleton project for end-users to develop notebook PGEs
 * `specs` - takes a `-n <path to notebook>` argument and generates a `hysdsio` and `job_spec` json file in the `docker/` directory
 * `execute` for notebook execution
+
 ```bash
 $ notebook-pge-wrapper --help
 Usage: notebook-pge-wrapper [OPTIONS] COMMAND [ARGS]...
@@ -63,6 +67,7 @@ hysds_time_limit -> time_limit
 hysds_soft_time_limit -> soft_time_limit
 hysds_disk_usage -> disk_usage
 hysds_required_queue -> required_queue
+hysds_command -> command
 
 # hysds-ios
 hysds_submission_type -> submission_type
@@ -88,12 +93,15 @@ hysds_disk_usage = "10GB"
 hysds_submission_type = "iteration"
 hysds_required_queue = "test_queue-worker"
 hysds_label = "TEST LABEL FOR HYSDS_IOS"
+hysds_command = "python script.py"  # (OPTIONAL)
+
 ```
 * `papermill`'s `inspect_notebook` function will extract variables from this cell
+* Can set parameter types 2 ways
+    * Adding a comment, ie. `x = 34  # type: int`
+    * [Python type hinting](https://docs.python.org/3/library/typing.html) (introduced in python 3.5)
 
-<p>
 The scripts here will help end users generate hysds-io.json and job-spec.json for Jupyter notebooks
-
 `spec_generator.py` has all the methods 
 * `generate_hysdsio` to generate `hysds-io.json.*`
 * `generate_job_spec` to generate `job-spec.json.*`
@@ -252,8 +260,6 @@ Add unit test files under `test/`
 ```bash
 python -m unittest
 ```
-</p>
-
 
 ## Related issues:
 * `hysds_io` and `job_specs` has values that are needed for job specification on execution

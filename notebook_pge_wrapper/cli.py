@@ -101,4 +101,4 @@ def execute(notebook_path, context=None):
 
     if context is None:
         context = '_context.json'
-    execute_notebook(notebook_path, context)
+    execute_notebook(notebook_path, ctx_file=context)

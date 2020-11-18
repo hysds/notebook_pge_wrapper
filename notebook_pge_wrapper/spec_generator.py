@@ -73,7 +73,7 @@ __MAPPER = {
 }
 
 
-def __get_hysdsio_param_type(t):
+def _get_hysdsio_param_type(t):
     """
     maps input to hysdsio type (using __MAPPER)
     :param t: str
@@ -84,7 +84,7 @@ def __get_hysdsio_param_type(t):
     return __MAPPER.get(t_lower, __TEXT)
 
 
-def __generate_hysdsio_params(nb_name):  # private method
+def _generate_hysdsio_params(nb_name):  # private method
     nb_params = papermill.inspect_notebook(nb_name)
     params = []
 
@@ -99,7 +99,7 @@ def __generate_hysdsio_params(nb_name):  # private method
         hysdsio_param = {
             'name': k,
             'from': 'submitter',
-            'type': __get_hysdsio_param_type(param_type)
+            'type': _get_hysdsio_param_type(param_type)
         }
         if description:
             hysdsio_param['description'] = description
@@ -155,7 +155,7 @@ def generate_hysdsio(job_label=None, sub_type=None, nb_name=None):
 
     sub_type = sub_type if sub_type in {'iteration', 'individual'} else None
 
-    hysdsio_params = __generate_hysdsio_params(nb_name)
+    hysdsio_params = _generate_hysdsio_params(nb_name)
     hysds_io = {
         'submission_type': sub_type,
         'params': hysdsio_params,
@@ -167,7 +167,7 @@ def generate_hysdsio(job_label=None, sub_type=None, nb_name=None):
 
 
 def generate_job_spec(time_limit=__DEFAULT_TIME_LIMIT, soft_time_limit=__DEFAULT_SOFT_TIME_LIMIT,
-                      disk_usage=__DEFAULT_DISK_USAGE, required_queue=None, nb=None):
+                      disk_usage=__DEFAULT_DISK_USAGE, required_queue=None, nb=None, command=None):
     """
     example: {
         "required_queues":["system-jobs-queue"],
@@ -182,6 +182,7 @@ def generate_job_spec(time_limit=__DEFAULT_TIME_LIMIT, soft_time_limit=__DEFAULT
     :param disk_usage: str (KB, MB, GB) ex. 10GB
     :param required_queue: str or List[str]
     :param nb: str, path of Jupyter notebook
+    :param command: str, command field in job_specs json
     :return: Dict[str, <any>]
     """
     if required_queue is None:
@@ -195,8 +196,6 @@ def generate_job_spec(time_limit=__DEFAULT_TIME_LIMIT, soft_time_limit=__DEFAULT
     nb_params = papermill.inspect_notebook(nb)
     params = []
 
-    nb_root = nb.split('/')[-1]  # get root notebook name
-
     for key in nb_params:
         if key.startswith('hysds_'):
             continue
@@ -207,7 +206,7 @@ def generate_job_spec(time_limit=__DEFAULT_TIME_LIMIT, soft_time_limit=__DEFAULT
         })
 
     output_job_spec = {
-        'command': 'python execute_notebook.py $HOME/notebook_pges/%s' % nb_root,
+        'command': command or 'notebook-pge-wrapper execute %s' % nb,
         'time_limit': time_limit,
         'soft_time_limit': soft_time_limit,
         'disk_usage': disk_usage,
@@ -235,6 +234,7 @@ def generate_spec_files(nb):
     submission_type = hysds_specs.get('submission_type', 'individual')
     required_queue = hysds_specs.get('required_queue', 'factotum-job_worker-small')
     label = hysds_specs.get('label')
+    command = hysds_specs.get('command')
 
     # generate hysds_io, copying hysds_io.json to docker/
     hysdsio = generate_hysdsio(nb_name=nb_path, sub_type=submission_type, job_label=label)
