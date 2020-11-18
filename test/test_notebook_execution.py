@@ -1,13 +1,13 @@
 import os
 import unittest
 
-from notebook_pge_wrapper.execute_notebook import execute
+from notebook_pge_wrapper.execute_notebook import execute, _create_nb_output_file_name
 
 
 class TestJobWorkerFuncs(unittest.TestCase):
     def setUp(self):
-        self.current_directory = os.path.dirname(os.path.abspath(__file__))
-        self.notebook_dir = os.path.join(self.current_directory, "notebook_pges")
+        self.test_loc = os.path.dirname(os.path.abspath(__file__))
+        self.notebook_dir = os.path.join(self.test_loc, "notebook_pges")
 
         self.stdout_file = '_alt_info.txt'
         self.stderr_file = '_alt_error.txt'
@@ -21,12 +21,17 @@ class TestJobWorkerFuncs(unittest.TestCase):
         if os.path.exists(stderr_file):
             os.remove(stderr_file)
 
-        for nb in os.listdir(self.notebook_dir):
+        for nb in os.listdir(os.getcwd()):
             if nb.endswith('-output.ipynb'):
-                output_file = os.path.join(self.notebook_dir, nb)
-                os.remove(output_file)
+                os.remove(nb)
 
     def test_notebook_execution(self):
         test_nb = os.path.join(self.notebook_dir, 'test.ipynb')
-        test_context = os.path.join(self.current_directory, '_context.json')
-        execute(test_nb, test_context)
+        test_context = os.path.join(self.test_loc, '_context.json')
+        execute(test_nb, ctx_file=test_context)
+
+    def test_output_nb_name_generation(self):
+        test_nb = os.path.join(self.notebook_dir, 'test.ipynb')
+        output_nb = _create_nb_output_file_name(test_nb)
+        expected_output_nb = 'test-output.ipynb'
+        self.assertEqual(output_nb, expected_output_nb)

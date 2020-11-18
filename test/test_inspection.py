@@ -1,6 +1,6 @@
 import os
 import unittest
-from notebook_pge_wrapper.spec_generator import extract_hysds_specs, generate_job_spec
+from notebook_pge_wrapper.spec_generator import extract_hysds_specs, generate_job_spec, _get_hysdsio_param_type
 
 
 class TestInspection(unittest.TestCase):
@@ -26,11 +26,44 @@ class TestInspection(unittest.TestCase):
         }
         self.assertDictEqual(hysds_specs, expected_hysds_specs)
 
+    def test_hysds_io_param_mapper(self):
+        __TEXT = 'text'
+        __NUMBER = 'number'
+        __DATE = 'date'
+        __DATETIME = 'datetime'
+        __BOOLEAN = 'boolean'
+        __EMAIL = 'email'
+        __TEXT_AREA = 'textarea'
+        __LIST = 'list'
+        __DICT = 'dict'
+
+        self.assertEqual(_get_hysdsio_param_type('str'), __TEXT)
+        self.assertEqual(_get_hysdsio_param_type('string'), __TEXT)
+        self.assertEqual(_get_hysdsio_param_type('text'), __TEXT)
+        self.assertEqual(_get_hysdsio_param_type('float'), __NUMBER)
+        self.assertEqual(_get_hysdsio_param_type('num'), __NUMBER)
+        self.assertEqual(_get_hysdsio_param_type('int'), __NUMBER)
+        self.assertEqual(_get_hysdsio_param_type('integer'), __NUMBER)
+        self.assertEqual(_get_hysdsio_param_type('date'), __DATE)
+        self.assertEqual(_get_hysdsio_param_type('date_time'), __DATETIME)
+        self.assertEqual(_get_hysdsio_param_type('datetime'), __DATETIME)
+        self.assertEqual(_get_hysdsio_param_type('bool'), __BOOLEAN)
+        self.assertEqual(_get_hysdsio_param_type('boolean'), __BOOLEAN)
+        self.assertEqual(_get_hysdsio_param_type('email'), __EMAIL)
+        self.assertEqual(_get_hysdsio_param_type('textarea'), __TEXT_AREA)
+        self.assertEqual(_get_hysdsio_param_type('list'), __LIST)
+        self.assertEqual(_get_hysdsio_param_type('array'), __LIST)
+        self.assertEqual(_get_hysdsio_param_type('arr'), __LIST)
+        self.assertEqual(_get_hysdsio_param_type('dict'), __DICT)
+        self.assertEqual(_get_hysdsio_param_type('obj'), __DICT)
+        self.assertEqual(_get_hysdsio_param_type('object'), __DICT)
+        self.assertEqual(_get_hysdsio_param_type('unknown_type'), __TEXT)
+
     def test_job_spec_generation(self):
         nb_path = os.path.join(self.notebook_dir, self.test_nb)
 
         expected_job_spec = {
-            'command': 'python execute_notebook.py $HOME/notebook_pges/test.ipynb',
+            'command': 'notebook-pge-wrapper execute %s' % nb_path,
             'disk_usage': '10GB',
             'imported_worker_files': {'$HOME/.aws': '/home/ops/.aws'},
             'params': [
