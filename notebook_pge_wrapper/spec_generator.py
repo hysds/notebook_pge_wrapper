@@ -247,7 +247,7 @@ def generate_spec_files(nb):
 
     # generate job_specs, copying job_specs.json to docker/
     job_spec = generate_job_spec(nb=nb_path, soft_time_limit=soft_time_limit, time_limit=time_limit,
-                                 required_queue=required_queue, disk_usage=disk_usage)
+                                 required_queue=required_queue, disk_usage=disk_usage, command=command)
     job_spec_file = 'job-spec.json.%s' % root_name
     job_spec_file_location = os.path.join('docker', job_spec_file)
 

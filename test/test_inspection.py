@@ -86,7 +86,8 @@ class TestInspection(unittest.TestCase):
         soft_time_limit = hysds_specs.get('soft_time_limit')
         disk_usage = hysds_specs.get('disk_usage')
         required_queue = hysds_specs.get('required_queue', 'factotum-job_worker-small')
+        command = hysds_specs.get('command')
 
         job_spec = generate_job_spec(nb=nb_path, soft_time_limit=soft_time_limit, time_limit=time_limit,
-                                     required_queue=required_queue, disk_usage=disk_usage)
+                                     required_queue=required_queue, disk_usage=disk_usage, command=command)
         self.assertDictEqual(job_spec, expected_job_spec)
