@@ -205,8 +205,11 @@ def generate_job_spec(time_limit=__DEFAULT_TIME_LIMIT, soft_time_limit=__DEFAULT
             'destination': 'context'
         })
 
+    repo = os.getcwd().split('/')[-1]
+    pge_verdi_path = os.path.join(repo, nb)
+
     output_job_spec = {
-        'command': command or 'notebook-pge-wrapper execute %s' % nb,
+        'command': command or 'notebook-pge-wrapper execute $HOME/%s' % pge_verdi_path,
         'time_limit': time_limit,
         'soft_time_limit': soft_time_limit,
         'disk_usage': disk_usage,

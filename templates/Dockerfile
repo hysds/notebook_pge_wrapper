@@ -38,6 +38,11 @@ RUN cd $HOME \
     && cd notebook_pge_wrapper \
     && sudo $CONDA_DIR/bin/pip install -e .
 
+# copy your repo into the docker container
+################################################
+# COPY . /home/ops/<repo name>
+################################################
+
 WORKDIR $HOME
 
 CMD ["/bin/bash", "--login"]

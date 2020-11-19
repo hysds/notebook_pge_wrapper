@@ -6,9 +6,9 @@ from notebook_pge_wrapper.spec_generator import extract_hysds_specs, generate_jo
 class TestInspection(unittest.TestCase):
     def setUp(self):
         self.maxDiff = None
-        self.current_directory = os.path.dirname(os.path.abspath(__file__))
-        self.notebook_dir = os.path.join(self.current_directory, "notebook_pges")
+        self.notebook_dir = "test/notebook_pges"
         self.test_nb = "test.ipynb"
+        self.test_nb_2 = "test2.ipynb"
 
     def tearDown(self):
         pass
@@ -63,7 +63,7 @@ class TestInspection(unittest.TestCase):
         nb_path = os.path.join(self.notebook_dir, self.test_nb)
 
         expected_job_spec = {
-            'command': 'notebook-pge-wrapper execute %s' % nb_path,
+            'command': 'notebook-pge-wrapper execute $HOME/notebook_pge_wrapper/test/notebook_pges/test.ipynb',
             'disk_usage': '10GB',
             'imported_worker_files': {'$HOME/.aws': '/home/ops/.aws'},
             'params': [
@@ -91,3 +91,12 @@ class TestInspection(unittest.TestCase):
         job_spec = generate_job_spec(nb=nb_path, soft_time_limit=soft_time_limit, time_limit=time_limit,
                                      required_queue=required_queue, disk_usage=disk_usage, command=command)
         self.assertDictEqual(job_spec, expected_job_spec)
+
+    def test_job_spec_command(self):
+        nb_path = os.path.join(self.notebook_dir, self.test_nb_2)
+
+        hysds_specs = extract_hysds_specs(nb_path)
+        expected_command = 'python custom_wrapper_script.py'
+        command = hysds_specs.get('command')
+
+        self.assertEqual(expected_command, command)
