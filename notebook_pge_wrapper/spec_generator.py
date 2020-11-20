@@ -97,16 +97,21 @@ def _extract_enumerable_values(param):
     :param param: OrderedDict, keys: name, default, inferred_type_name, help
     :return: List[<any>], str
     """
-    default = param['default']
+    value = param['default']
     try:
-        enums = json.loads(default)
+        enums = json.loads(value)
     except (json.decoder.JSONDecodeError, Exception) as e:
         print(e)
-        raise RuntimeError("make sure your enum follows JSON standards: {}".format(default))
+        raise RuntimeError("make sure your enum follows JSON standards: {}".format(value))
 
     if type(enums) != list:
         raise RuntimeError("list elements must be wrapped with double quotes")
-    return enums, enums[0]
+
+    default_value = enums[0]
+    if type(default_value) in (int, str):
+        default_value = '"{}"'.format(default_value)  # wrapping in double quotes to it can json decode
+
+    return enums, default_value
 
 
 def _generate_hysdsio_params(nb_name):  # private method
@@ -134,12 +139,13 @@ def _generate_hysdsio_params(nb_name):  # private method
 
         if description:
             hysdsio_param['description'] = description
-        if default_value:
-            try:
-                hysdsio_param['default'] = json.loads(default_value)
-            except Exception as e:
-                print(e)
-                raise RuntimeError("make sure your enum follows JSON standards: {}".format(default_value))
+
+        print("default_value: ", default_value)
+        try:
+            hysdsio_param['default'] = json.loads(default_value)
+        except Exception as e:
+            print(e)
+            raise RuntimeError("make sure your parameter follows JSON standards: {}".format(default_value))
 
         params.append(hysdsio_param)
     return params

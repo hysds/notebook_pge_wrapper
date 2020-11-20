@@ -85,6 +85,7 @@ d = [1,2,3,4,5] # type: List
 e: List[str] = ['a', 'b', 'c']
 f = "fjskl"
 g: List[str] = ["a", "b", "c"]
+h: "enum" = ["yes", "no", "maybe so"]
 
 # hysds specs
 hysds_time_limit = 57389

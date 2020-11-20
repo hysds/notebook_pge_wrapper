@@ -104,7 +104,7 @@ class TestInspection(unittest.TestCase):
             {'default': 10.2553, 'from': 'submitter', 'name': 'c', 'type': 'number'},
             {'default': [1, 2, 3, 4, 5], 'from': 'submitter', 'name': 'd', 'type': 'list'},
             {
-                'default': "['a', 'b', 'c']",
+                'default': ['a', 'b', 'c'],
                 'from': 'submitter',
                 'name': 'e',
                 'type': 'text'
