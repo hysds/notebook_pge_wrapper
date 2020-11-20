@@ -108,9 +108,6 @@ def _extract_enumerable_values(param):
         raise RuntimeError("list elements must be wrapped with double quotes")
 
     default_value = enums[0]
-    if type(default_value) in (int, str):
-        default_value = '"{}"'.format(default_value)  # wrapping in double quotes to it can json decode
-
     return enums, default_value
 
 
@@ -131,21 +128,20 @@ def _generate_hysdsio_params(nb_name):  # private method
             'type': _get_hysdsio_param_type(param_type)
         }
 
-        if param_type.lower() != 'enum':
-            default_value = p['default']
-        else:
-            enums, default_value = _extract_enumerable_values(p)
-            hysdsio_param['enumerables'] = enums
-
         if description:
             hysdsio_param['description'] = description
 
-        print("default_value: ", default_value)
-        try:
-            hysdsio_param['default'] = json.loads(default_value)
-        except Exception as e:
-            print(e)
-            raise RuntimeError("make sure your parameter follows JSON standards: {}".format(default_value))
+        if param_type.lower() == 'enum':
+            enums, default_value = _extract_enumerable_values(p)
+            hysdsio_param['enumerables'] = enums
+            hysdsio_param['default'] = default_value
+        else:
+            default_value = p['default']
+            try:
+                hysdsio_param['default'] = json.loads(default_value)
+            except Exception as e:
+                print(e)
+                raise RuntimeError("make sure your parameter follows JSON standards: {}".format(default_value))
 
         params.append(hysdsio_param)
     return params
