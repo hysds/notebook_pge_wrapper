@@ -1,6 +1,7 @@
 import os
 import unittest
-from notebook_pge_wrapper.spec_generator import extract_hysds_specs, generate_job_spec, _get_hysdsio_param_type
+from notebook_pge_wrapper.spec_generator import extract_hysds_specs, generate_job_spec, _get_hysdsio_param_type, \
+    _generate_hysdsio_params
 
 
 class TestInspection(unittest.TestCase):
@@ -73,7 +74,8 @@ class TestInspection(unittest.TestCase):
                 {'destination': 'context', 'name': 'd'},
                 {'destination': 'context', 'name': 'e'},
                 {'destination': 'context', 'name': 'f'},
-                {'destination': 'context', 'name': 'g'}
+                {'destination': 'context', 'name': 'g'},
+                {'destination': 'context', 'name': 'h'},
             ],
             'required_queues': ['test_queue-worker'],
             'soft_time_limit': 4738,
@@ -91,6 +93,33 @@ class TestInspection(unittest.TestCase):
         job_spec = generate_job_spec(nb=nb_path, soft_time_limit=soft_time_limit, time_limit=time_limit,
                                      required_queue=required_queue, disk_usage=disk_usage, command=command)
         self.assertDictEqual(job_spec, expected_job_spec)
+
+    def test_hysds_io_param_generation(self):
+        nb_path = os.path.join(self.notebook_dir, self.test_nb)
+
+        hysds_io_params = _generate_hysdsio_params(nb_path)
+        expected_hysds_io_params = [
+            {'default': 100, 'from': 'submitter', 'name': 'a', 'type': 'number'},
+            {'default': 'jfksl', 'from': 'submitter', 'name': 'b', 'type': 'text'},
+            {'default': 10.2553, 'from': 'submitter', 'name': 'c', 'type': 'number'},
+            {'default': [1, 2, 3, 4, 5], 'from': 'submitter', 'name': 'd', 'type': 'list'},
+            {
+                'default': "['a', 'b', 'c']",
+                'from': 'submitter',
+                'name': 'e',
+                'type': 'text'
+            },
+            {'default': 'fjskl', 'from': 'submitter', 'name': 'f', 'type': 'text'},
+            {'default': ['a', 'b', 'c'], 'from': 'submitter', 'name': 'g', 'type': 'text'},
+            {
+                'default': 'yes',
+                'enumerables': ['yes', 'no', 'maybe so'],
+                'from': 'submitter',
+                'name': 'h',
+                'type': 'enum'
+            }
+        ]
+        self.assertEqual(hysds_io_params, expected_hysds_io_params)
 
     def test_job_spec_command(self):
         nb_path = os.path.join(self.notebook_dir, self.test_nb_2)

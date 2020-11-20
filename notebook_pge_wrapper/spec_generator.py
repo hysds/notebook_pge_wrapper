@@ -39,7 +39,7 @@ __NUMBER = 'number'
 __DATE = 'date'
 __DATETIME = 'datetime'
 __BOOLEAN = 'boolean'
-# __ENUM = 'enum'
+__ENUM = 'enum'
 # __NOTE = 'note'
 __EMAIL = 'email'
 __TEXT_AREA = 'textarea'
@@ -62,6 +62,7 @@ __MAPPER = {
     'datetime': __DATETIME,
     'bool': __BOOLEAN,
     'boolean': __BOOLEAN,
+    'enum': __ENUM,
     'email': __EMAIL,
     'textarea': __TEXT_AREA,
     'list': __LIST,
@@ -84,6 +85,30 @@ def _get_hysdsio_param_type(t):
     return __MAPPER.get(t_lower, __TEXT)
 
 
+def _extract_enumerable_values(param):
+    """
+    example of enum type: {
+      "name": "processing_type",
+      "from": "submitter",
+      "type": "enum",
+      "enumerables": ["forward", "reprocessing", "urgent"],
+      "default": "forward"
+    },
+    :param param: OrderedDict, keys: name, default, inferred_type_name, help
+    :return: List[<any>], str
+    """
+    default = param['default']
+    try:
+        enums = json.loads(default)
+    except (json.decoder.JSONDecodeError, Exception) as e:
+        print(e)
+        raise RuntimeError("make sure your enum follows JSON standards: {}".format(default))
+
+    if type(enums) != list:
+        raise RuntimeError("list elements must be wrapped with double quotes")
+    return enums, enums[0]
+
+
 def _generate_hysdsio_params(nb_name):  # private method
     nb_params = papermill.inspect_notebook(nb_name)
     params = []
@@ -94,13 +119,19 @@ def _generate_hysdsio_params(nb_name):  # private method
 
         param_type = p['inferred_type_name']
         description = p['help']
-        default_value = p['default']
 
         hysdsio_param = {
             'name': k,
             'from': 'submitter',
             'type': _get_hysdsio_param_type(param_type)
         }
+
+        if param_type.lower() != 'enum':
+            default_value = p['default']
+        else:
+            enums, default_value = _extract_enumerable_values(p)
+            hysdsio_param['enumerables'] = enums
+
         if description:
             hysdsio_param['description'] = description
         if default_value:
@@ -108,7 +139,7 @@ def _generate_hysdsio_params(nb_name):  # private method
                 hysdsio_param['default'] = json.loads(default_value)
             except Exception as e:
                 print(e)
-                hysdsio_param['default'] = default_value
+                raise RuntimeError("make sure your enum follows JSON standards: {}".format(default_value))
 
         params.append(hysdsio_param)
     return params
@@ -244,15 +275,16 @@ def generate_spec_files(nb):
     hysdsio_file = 'hysds-io.json.%s' % root_name
     hysdsio_file_location = os.path.join('docker', hysdsio_file)
 
-    with open(hysdsio_file_location, 'w+') as f:
-        json.dump(hysdsio, f, indent=2)
-    print('generated %s' % hysdsio_file_location)
-
     # generate job_specs, copying job_specs.json to docker/
     job_spec = generate_job_spec(nb=nb_path, soft_time_limit=soft_time_limit, time_limit=time_limit,
                                  required_queue=required_queue, disk_usage=disk_usage, command=command)
     job_spec_file = 'job-spec.json.%s' % root_name
     job_spec_file_location = os.path.join('docker', job_spec_file)
+
+    # creating the spec json files after both checks are successful
+    with open(hysdsio_file_location, 'w+') as f:
+        json.dump(hysdsio, f, indent=2)
+    print('generated %s' % hysdsio_file_location)
 
     with open(job_spec_file_location, 'w+') as f:
         json.dump(job_spec, f, indent=2)
