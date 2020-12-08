@@ -64,7 +64,7 @@ class TestInspection(unittest.TestCase):
         nb_path = os.path.join(self.notebook_dir, self.test_nb)
 
         expected_job_spec = {
-            'command': 'notebook-pge-wrapper execute $HOME/notebook_pge_wrapper/test/notebook_pges/test.ipynb',
+            'command': 'notebook-pge-wrapper execute /home/ops/notebook_pge_wrapper/test/notebook_pges/test.ipynb',
             'disk_usage': '10GB',
             'imported_worker_files': {'$HOME/.aws': '/home/ops/.aws'},
             'params': [
@@ -99,21 +99,21 @@ class TestInspection(unittest.TestCase):
 
         hysds_io_params = _generate_hysdsio_params(nb_path)
         expected_hysds_io_params = [
-            {'default': 100, 'from': 'submitter', 'name': 'a', 'type': 'number'},
+            {'default': '100', 'from': 'submitter', 'name': 'a', 'type': 'number'},
             {'default': 'jfksl', 'from': 'submitter', 'name': 'b', 'type': 'text'},
-            {'default': 10.2553, 'from': 'submitter', 'name': 'c', 'type': 'number'},
-            {'default': [1, 2, 3, 4, 5], 'from': 'submitter', 'name': 'd', 'type': 'list'},
+            {'default': '10.2553', 'from': 'submitter', 'name': 'c', 'type': 'number'},
+            {'default': "[1, 2, 3, 4, 5]", 'from': 'submitter', 'name': 'd', 'type': 'list'},
             {
-                'default': ['a', 'b', 'c'],
+                'default': '["a", "b", "c"]',
                 'from': 'submitter',
                 'name': 'e',
                 'type': 'text'
             },
             {'default': 'fjskl', 'from': 'submitter', 'name': 'f', 'type': 'text'},
-            {'default': ['a', 'b', 'c'], 'from': 'submitter', 'name': 'g', 'type': 'text'},
+            {'default': '["a", "b", "c"]', 'from': 'submitter', 'name': 'g', 'type': 'text'},
             {
                 'default': 'yes',
-                'enumerables': ['yes', 'no', 'maybe so'],
+                'enumerables': '["yes", "no", "maybe so"]',
                 'from': 'submitter',
                 'name': 'h',
                 'type': 'enum'

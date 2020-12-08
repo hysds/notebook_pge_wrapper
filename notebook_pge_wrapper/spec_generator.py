@@ -110,7 +110,7 @@ def _extract_enumerable_values(param):
     default_value = enums[0]
     if type(default_value) != str:
         default_value = json.dumps(default_value)
-    return enums, default_value
+    return json.dumps(enums), default_value
 
 
 def _generate_hysdsio_params(nb_name):  # private method
@@ -243,7 +243,7 @@ def generate_job_spec(time_limit=__DEFAULT_TIME_LIMIT, soft_time_limit=__DEFAULT
     pge_verdi_path = os.path.join(repo, nb)
 
     output_job_spec = {
-        'command': command or 'notebook-pge-wrapper execute $HOME/%s' % pge_verdi_path,
+        'command': command or 'notebook-pge-wrapper execute /home/ops/%s' % pge_verdi_path,
         'time_limit': time_limit,
         'soft_time_limit': soft_time_limit,
         'disk_usage': disk_usage,
