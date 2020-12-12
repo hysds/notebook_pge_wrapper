@@ -197,6 +197,8 @@ def generate_hysdsio(job_label=None, sub_type=None, nb_name=None):
     }
     if job_label:
         hysds_io['label'] = job_label
+    else:
+        raise RuntimeError("Missing job_label, please add 'hysds_job_label' to your notebook parameters")
     return hysds_io
 
 
