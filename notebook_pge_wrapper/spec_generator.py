@@ -265,9 +265,9 @@ def generate_spec_files(nb):
     # extracting hysds_io and job_specs from notebook
     hysds_specs = extract_hysds_specs(nb_path)
 
-    time_limit = hysds_specs.get('time_limit')
-    soft_time_limit = hysds_specs.get('soft_time_limit')
-    disk_usage = hysds_specs.get('disk_usage')
+    time_limit = hysds_specs.get('time_limit', __DEFAULT_TIME_LIMIT)
+    soft_time_limit = hysds_specs.get('soft_time_limit', __DEFAULT_SOFT_TIME_LIMIT)
+    disk_usage = hysds_specs.get('disk_usage', __DEFAULT_DISK_USAGE)
     submission_type = hysds_specs.get('submission_type', 'individual')
     required_queue = hysds_specs.get('required_queue', 'factotum-job_worker-small')
     label = hysds_specs.get('label')
