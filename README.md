@@ -6,7 +6,7 @@
 
 ## Dependencies:
 * Python 3
-* `click>=7.1.2`
+* `click`
 * `papermill>=2.2.0` (`2.2.0` added `inspect_notebook`)
 
 ## Installation
