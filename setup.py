@@ -14,6 +14,6 @@ setup(
     },
     install_requires=[
         'click>=7.1.2',
-        'papermill==2.2.0',
+        'papermill>=2.2.0',
     ]
 )
