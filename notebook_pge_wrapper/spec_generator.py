@@ -1,5 +1,6 @@
 import os
 import json
+import ast
 import traceback
 import argparse
 
@@ -40,14 +41,13 @@ __DATE = 'date'
 __DATETIME = 'datetime'
 __BOOLEAN = 'boolean'
 __ENUM = 'enum'
-# __NOTE = 'note'
+__NOTE = 'note'
 __EMAIL = 'email'
 __TEXT_AREA = 'textarea'
-# __CONTAINER_VERSION = 'container_version'
-# __JOBSPEC_VERSION = 'jobspec_version'
-# __REGION = 'region'
-__LIST = 'list'
-__DICT = 'dict'
+__CONTAINER_VERSION = 'container_version'
+__JOBSPEC_VERSION = 'jobspec_version'
+__REGION = 'region'
+__OBJECT = 'object'
 
 __MAPPER = {
     'str': __TEXT,
@@ -65,12 +65,12 @@ __MAPPER = {
     'enum': __ENUM,
     'email': __EMAIL,
     'textarea': __TEXT_AREA,
-    'list': __LIST,
-    'array': __LIST,
-    'arr': __LIST,
-    'dict': __DICT,
-    'obj': __DICT,
-    'object': __DICT
+    'list': __OBJECT,
+    'array': __OBJECT,
+    'arr': __OBJECT,
+    'dict': __OBJECT,
+    'obj': __OBJECT,
+    'object': __OBJECT
 }
 
 
@@ -80,8 +80,11 @@ def _get_hysdsio_param_type(t):
     :param t: str
     :return: str
     """
-    # TODO: may need to include List and Dict type, maybe use str.startswith()?
     t_lower = t.lower()
+    if t_lower.startswith('dict') or t_lower.startswith('list') or t_lower.startswith('arr') or \
+            t_lower.startswith('obj'):
+        return __OBJECT
+
     return __MAPPER.get(t_lower, __TEXT)
 
 
@@ -99,8 +102,8 @@ def _extract_enumerable_values(param):
     """
     value = param['default']
     try:
-        enums = json.loads(value)
-    except (json.decoder.JSONDecodeError, Exception) as e:
+        enums = ast.literal_eval(value)
+    except Exception as e:
         print(e)
         raise RuntimeError("make sure your enum follows JSON standards: {}".format(value))
 
@@ -109,8 +112,8 @@ def _extract_enumerable_values(param):
 
     default_value = enums[0]
     if type(default_value) != str:
-        default_value = json.dumps(default_value)
-    return json.dumps(enums), default_value
+        default_value = str(default_value)
+    return enums, default_value
 
 
 def _generate_hysdsio_params(nb_name):  # private method
@@ -139,9 +142,9 @@ def _generate_hysdsio_params(nb_name):  # private method
             hysdsio_param['default'] = default_value
         else:
             # NOTE: need to parse value as strings
-            default_value = json.loads(p['default'])
-            if type(default_value) != str:
-                default_value = json.dumps(default_value)
+            default_value = ast.literal_eval(p['default'])
+            if type(default_value) in (int, float):
+                default_value = str(default_value)
             hysdsio_param['default'] = default_value
 
         params.append(hysdsio_param)
@@ -159,8 +162,8 @@ def extract_hysds_specs(nb_name):
         k = k.replace('hysds_', '')
         default_value = p['default']
         try:
-            hysds_specs[k] = json.loads(default_value)
-        except (json.JSONDecodeError, Exception) as e:
+            hysds_specs[k] = ast.literal_eval(default_value)
+        except Exception as e:
             print(default_value, e)
             traceback.print_exc()
             p['default'] = default_value[1:-1]
@@ -240,7 +243,6 @@ def generate_job_spec(time_limit=__DEFAULT_TIME_LIMIT, soft_time_limit=__DEFAULT
             'name': key,
             'destination': 'context'
         })
-
     repo = os.getcwd().split('/')[-1]
     pge_verdi_path = os.path.join(repo, nb)
 

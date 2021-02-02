@@ -35,8 +35,8 @@ class TestInspection(unittest.TestCase):
         __BOOLEAN = 'boolean'
         __EMAIL = 'email'
         __TEXT_AREA = 'textarea'
-        __LIST = 'list'
-        __DICT = 'dict'
+        __LIST = 'object'
+        __DICT = 'object'
 
         self.assertEqual(_get_hysdsio_param_type('str'), __TEXT)
         self.assertEqual(_get_hysdsio_param_type('string'), __TEXT)
@@ -102,21 +102,26 @@ class TestInspection(unittest.TestCase):
             {'default': '100', 'from': 'submitter', 'name': 'a', 'type': 'number'},
             {'default': 'jfksl', 'from': 'submitter', 'name': 'b', 'type': 'text'},
             {'default': '10.2553', 'from': 'submitter', 'name': 'c', 'type': 'number'},
-            {'default': "[1, 2, 3, 4, 5]", 'from': 'submitter', 'name': 'd', 'type': 'list'},
+            {'default': [1, 2, 3, 4, 5], 'from': 'submitter', 'name': 'd', 'type': 'object'},
             {
-                'default': '["a", "b", "c"]',
+                'default': ['a', 'b', 'c'],
                 'from': 'submitter',
                 'name': 'e',
-                'type': 'text'
+                'type': 'object'
             },
             {'default': 'fjskl', 'from': 'submitter', 'name': 'f', 'type': 'text'},
-            {'default': '["a", "b", "c"]', 'from': 'submitter', 'name': 'g', 'type': 'text'},
             {
                 'default': 'yes',
-                'enumerables': '["yes", "no", "maybe so"]',
+                'enumerables': ["yes", "no", "maybe so"],
+                'from': 'submitter',
+                'name': 'g',
+                'type': 'enum'
+            },
+            {
+                'default': {'a': 1, "b": 2, 'c': 3},
                 'from': 'submitter',
                 'name': 'h',
-                'type': 'enum'
+                'type': 'object'
             }
         ]
         self.assertEqual(hysds_io_params, expected_hysds_io_params)
