@@ -34,7 +34,7 @@ RUN curl -sSL https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64
 RUN mkdir -p /data/work \
     && chown -R ops:ops /data/work
 
-USER ops
+USER jovyan
 
 RUN cd $HOME \
     && git clone https://github.com/hysds/notebook_pge_wrapper.git \
