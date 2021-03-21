@@ -247,13 +247,13 @@ def generate_job_spec(time_limit=__DEFAULT_TIME_LIMIT, soft_time_limit=__DEFAULT
     pge_verdi_path = os.path.join(repo, nb)
 
     output_job_spec = {
-        'command': command or 'notebook-pge-wrapper execute /home/ops/%s' % pge_verdi_path,
+        'command': command or 'notebook-pge-wrapper execute /home/jovyan/%s' % pge_verdi_path,
         'time_limit': time_limit,
         'soft_time_limit': soft_time_limit,
         'disk_usage': disk_usage,
         'required_queues': required_queue,
         'imported_worker_files': {
-            "$HOME/.aws": "/home/ops/.aws"
+            "$HOME/.aws": "/home/jovyan/.aws"
         },
         'params': params
     }
