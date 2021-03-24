@@ -210,7 +210,7 @@ def generate_job_spec(time_limit=__DEFAULT_TIME_LIMIT, soft_time_limit=__DEFAULT
     """
     example: {
         "required_queues":["system-jobs-queue"],
-        "command":"/path/to/papermill_wrapper.py $HOME/hello_world.ipynb",
+        "command":"/path/to/papermill_wrapper.py $HOME/PGE_NAME_PLACEHOLDER.ipynb",
         "disk_usage":"3GB",
         "soft_time_limit": 86400,
         "time_limit": 86700,

@@ -5,11 +5,12 @@ import click
 from notebook_pge_wrapper.spec_generator import generate_spec_files
 from notebook_pge_wrapper.execute_notebook import execute as execute_notebook
 
-
 __NOTEBOOK_DIR = 'notebook_pges'
 __DOCKER_DIR = 'docker'
 __DOCKERFILE = 'Dockerfile'
 __README_FILE = 'README.md'
+__PGE_CREATE_NOTEBOOK_FILE = 'pge_create.ipynb'
+__SUBMIT_JOB_NOTEBOOK_FILE = 'submit_job.ipynb'
 
 
 @click.group()
@@ -26,6 +27,8 @@ def create(project):
     ├── README.md\n
     ├── docker/\n
     │   └── Dockerfile\n
+    ├── pge_create.ipynb/\n
+    ├── submit_job.ipynb/\n
     └── notebook_pges/
 
     :param project: New notebook project name (or path)
@@ -41,6 +44,8 @@ def create(project):
     templates = os.path.join(project_root, '..', 'templates')
     docker_file = os.path.join(templates, __DOCKERFILE)
     readme_file = os.path.join(templates, __README_FILE)
+    pge_create_notebook_file = os.path.join(templates, __PGE_CREATE_NOTEBOOK_FILE)
+    submit_job_notebook_file = os.path.join(templates, __SUBMIT_JOB_NOTEBOOK_FILE)
 
     if not os.path.exists(project):
         os.mkdir(project)
@@ -58,6 +63,20 @@ def create(project):
 
     # create README.md
     copyfile(readme_file, os.path.join(project, __README_FILE))
+
+    # create pge_create notebook
+    pge_create_notebook_dest = os.path.join(project, __PGE_CREATE_NOTEBOOK_FILE)
+    with open(pge_create_notebook_file, 'r') as pge_create_infile, \
+            open(pge_create_notebook_dest, 'w+') as pge_create_outfile:
+        templated_pge_create_content = pge_create_infile.read().replace('PGE_NAME_PLACEHOLDER', project)
+        pge_create_outfile.write(templated_pge_create_content)
+
+    # create submit_job notebook
+    submit_job_notebook_dest = os.path.join(project, __SUBMIT_JOB_NOTEBOOK_FILE)
+    with open(submit_job_notebook_file, 'r') as submit_job_infile, \
+            open(submit_job_notebook_dest, 'w+') as submit_job_outfile:
+        templated_submit_job_content = submit_job_infile.read().replace('PGE_NAME_PLACEHOLDER', project)
+        submit_job_outfile.write(templated_submit_job_content)
 
 
 @cli.command()
