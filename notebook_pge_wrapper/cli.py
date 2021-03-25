@@ -11,6 +11,7 @@ __DOCKERFILE = 'Dockerfile'
 __README_FILE = 'README.md'
 __PGE_CREATE_NOTEBOOK_FILE = 'pge_create.ipynb'
 __SUBMIT_JOB_NOTEBOOK_FILE = 'submit_job.ipynb'
+__SAMPLE_PGE_NOTEBOOK_FILE = 'sample_pge.ipynb'
 
 
 @click.group()
@@ -29,7 +30,8 @@ def create(project):
     │   └── Dockerfile\n
     ├── pge_create.ipynb/\n
     ├── submit_job.ipynb/\n
-    └── notebook_pges/
+    └── notebook_pges/\n
+        └── sample_pge.ipynb
 
     :param project: New notebook project name (or path)
     """
@@ -46,6 +48,7 @@ def create(project):
     readme_file = os.path.join(templates, __README_FILE)
     pge_create_notebook_file = os.path.join(templates, __PGE_CREATE_NOTEBOOK_FILE)
     submit_job_notebook_file = os.path.join(templates, __SUBMIT_JOB_NOTEBOOK_FILE)
+    sample_pge_notebook_file = os.path.join(templates, __SAMPLE_PGE_NOTEBOOK_FILE)
 
     if not os.path.exists(project):
         os.mkdir(project)
@@ -60,6 +63,9 @@ def create(project):
     # create notebook_pges directory
     if not os.path.exists(notebook_pges_directory):
         os.mkdir(notebook_pges_directory)
+
+    # create sample pge notebook
+    copyfile(sample_pge_notebook_file, os.path.join(notebook_pges_directory, __SAMPLE_PGE_NOTEBOOK_FILE))
 
     # create README.md
     copyfile(readme_file, os.path.join(project, __README_FILE))

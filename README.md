@@ -45,11 +45,14 @@ $ notebook-pge-wrapper create <project_name>
 ```
 The following project structure will be generated
 ```
-<project_name>
-├── README.md
-├── docker/
-│   └── Dockerfile
-└── notebook_pges/
+<project_root>\n
+├── README.md\n
+├── docker/\n
+│   └── Dockerfile\n
+├── pge_create.ipynb/\n
+├── submit_job.ipynb/\n
+└── notebook_pges/\n
+    └── sample_pge.ipynb
 ```
 * `Dockerfile` will go through [container-builder](https://github.com/hysds/container-builder) to build the docker image
     * Will later be used to execute the notebook in a PGE setting
