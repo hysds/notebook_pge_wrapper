@@ -48,7 +48,7 @@ def _build_notebook_params(nb, ctx):
 
     params = {}
     for k, p in nb_params.items():
-        if k.startswith('hysds_'):
+        if k.startswith('hysds_') or k.startswith('_'):
             continue
         if ctx.get(k) is not None:  # if key is found in _context.json then populate params dict with value
             params[k] = ctx[k]
