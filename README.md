@@ -61,8 +61,7 @@ The following project structure will be generated
 
 ## HySDS job specs generation
 * Tag the top notebook cell with `parameters`
-* prepend any hysds specification fields with `_` and `extract_hysds_specs` will populate `hysds-io` and 
-`job_specs` with it's specified values
+* prepend any hysds specification fields with `_` and `extract_hysds_specs` will populate `hysds-io` and `job_specs` with it's specified values
     * If not found it will set to `default` values (ie. `time_limit: 3600`)
 ```
 # job_specs

@@ -121,7 +121,7 @@ def _generate_hysdsio_params(nb_name):  # private method
     params = []
 
     for k, p in nb_params.items():
-        if k.startswith('hysds_'):
+        if k.startswith('hysds_') or k.startswith('_'):
             continue
 
         param_type = p['inferred_type_name']
@@ -156,10 +156,15 @@ def extract_hysds_specs(nb_name):
 
     hysds_specs = {}
     for k, p in nb_params.items():
-        if not k.startswith('hysds_'):
+        if not k.startswith('hysds_') and not k.startswith('_'):
             continue
 
-        k = k.replace('hysds_', '')
+        if k.startswith('hysds_'):
+            k = k.replace('hysds_', '')
+            print("DEPRECATION WARNING: please prefix parameter (%s) with '_' instead of 'hysds_'" % k)
+        else:
+            k = k[1:]
+
         default_value = p['default']
         try:
             hysds_specs[k] = ast.literal_eval(default_value)
@@ -236,7 +241,7 @@ def generate_job_spec(time_limit=__DEFAULT_TIME_LIMIT, soft_time_limit=__DEFAULT
     params = []
 
     for key in nb_params:
-        if key.startswith('hysds_'):
+        if key.startswith('hysds_') or key.startswith('_'):
             continue
 
         params.append({
