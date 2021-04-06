@@ -65,7 +65,7 @@ def create(project):
         os.mkdir(notebook_pges_directory)
 
     # create sample pge notebook
-    copyfile(sample_pge_notebook_file, os.path.join(notebook_pges_directory, __SAMPLE_PGE_NOTEBOOK_FILE))
+    copyfile(sample_pge_notebook_file, os.path.join(notebook_pges_directory, f'{project}_{__SAMPLE_PGE_NOTEBOOK_FILE}'))
 
     # create README.md
     copyfile(readme_file, os.path.join(project, __README_FILE))
