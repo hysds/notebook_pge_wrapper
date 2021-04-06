@@ -19,6 +19,9 @@ RUN cd $HOME \
 #COPY . $HOME/<repo name>
 ################################################
 
+# installing user defined dependencies
+RUN $HOME/verdi/bin/papermill $HOME/hello_world/docker/requirements.ipynb $HOME/hello_world/docker/requirements_output.ipynb --log-output
+
 WORKDIR $HOME
 
 CMD ["/bin/bash", "--login"]

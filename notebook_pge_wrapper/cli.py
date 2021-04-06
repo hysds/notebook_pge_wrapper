@@ -10,6 +10,7 @@ __NOTEBOOK_DIR = 'notebook_pges'
 __DOCKER_DIR = 'docker'
 __DOCKERFILE = 'Dockerfile'
 __README_FILE = 'README.md'
+__REQUIREMENTS = 'requirements.ipynb'
 
 
 @click.group()
@@ -41,6 +42,7 @@ def create(project):
     templates = os.path.join(project_root, '..', 'templates')
     docker_file = os.path.join(templates, __DOCKERFILE)
     readme_file = os.path.join(templates, __README_FILE)
+    requirements_file = os.path.join(templates, __REQUIREMENTS)
 
     if not os.path.exists(project):
         os.mkdir(project)
@@ -58,6 +60,9 @@ def create(project):
 
     # create README.md
     copyfile(readme_file, os.path.join(project, __README_FILE))
+
+    # create requirements.ipynb
+    copyfile(requirements_file, os.path.join(docker_directory, __REQUIREMENTS))
 
 
 @cli.command()
