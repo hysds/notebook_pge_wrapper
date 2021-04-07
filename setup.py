@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='notebook_pge_wrapper',
-    version='1.0.2',
+    version='1.0.3',
     long_description='Library to generate hysds_io and job_specs for Jupyter notebooks',
     packages=find_packages(),
     include_package_data=True,
@@ -14,6 +14,8 @@ setup(
     },
     install_requires=[
         'click>=7.1.2',
+        'Jinja2>=2.11.3',
+        'PyYAML>=5.4.1',
         'papermill>=2.2.0',
     ]
 )

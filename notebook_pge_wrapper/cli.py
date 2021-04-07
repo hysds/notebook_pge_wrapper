@@ -1,15 +1,47 @@
 import os
 from shutil import copyfile
+import yaml
 import click
+from jinja2 import Template
 
 from notebook_pge_wrapper.spec_generator import generate_spec_files
 from notebook_pge_wrapper.execute_notebook import execute as execute_notebook
 
 
+__SETTINGS = 'settings.yml'
 __NOTEBOOK_DIR = 'notebook_pges'
 __DOCKER_DIR = 'docker'
+__DOCKERFILE_TEMPLATE = 'Dockerfile.template'
 __DOCKERFILE = 'Dockerfile'
 __README_FILE = 'README.md'
+
+
+def read_settings(f):
+    """
+    reads the settings.yaml file
+    :param f: file path to settings.yml
+    :return: Dict[str, str]
+    """
+    try:
+        with open(f, 'r') as f:
+            settings = yaml.safe_load(f)
+            return settings
+    except FileNotFoundError as e:
+        raise e
+    except yaml.YAMLError as e:
+        raise e
+    except Exception as e:
+        raise e
+
+
+def read_docker_template(f):
+    """
+    reads docker template file
+    :param f:
+    :return: str
+    """
+    with open(f, 'r') as f:
+        return f.read()
 
 
 @click.group()
@@ -39,7 +71,6 @@ def create(project):
     notebook_pges_directory = os.path.join(project, __NOTEBOOK_DIR)
 
     templates = os.path.join(project_root, '..', 'templates')
-    docker_file = os.path.join(templates, __DOCKERFILE)
     readme_file = os.path.join(templates, __README_FILE)
 
     if not os.path.exists(project):
@@ -49,8 +80,22 @@ def create(project):
     if not os.path.exists(docker_directory):
         os.mkdir(docker_directory)
 
+    settings = read_settings(os.path.join(templates, __SETTINGS))
+    base_image = settings['base_image']
+
+    docker_template = read_docker_template(os.path.join(templates, __DOCKERFILE_TEMPLATE))
+    docker_template = Template(docker_template)
+    docker_template = docker_template.render(base_image=base_image, project=project)
+
     # create Dockerfile
-    copyfile(docker_file, os.path.join(docker_directory, __DOCKERFILE))
+    with open(os.path.join(docker_directory, __DOCKERFILE), 'w') as f:
+        f.write(docker_template)
+
+    # copy Dockerfile.template to project
+    copyfile(
+        os.path.join(templates, __DOCKERFILE_TEMPLATE),
+        os.path.join(project, __DOCKER_DIR, __DOCKERFILE_TEMPLATE)
+    )
 
     # create notebook_pges directory
     if not os.path.exists(notebook_pges_directory):
@@ -58,6 +103,33 @@ def create(project):
 
     # create README.md
     copyfile(readme_file, os.path.join(project, __README_FILE))
+
+    # copy settings file
+    copyfile(
+        os.path.join(templates, __SETTINGS),
+        os.path.join(project, __SETTINGS)
+    )
+
+
+@cli.command()
+@click.argument('update')
+def docker(update):
+    """
+    updates the Dockerfile template with values from settings.yml
+    :param update:
+    """
+    base, project_root = os.path.split(os.getcwd())
+
+    settings = read_settings(__SETTINGS)
+    base_image = settings['base_image']
+
+    docker_template = read_docker_template(os.path.join(__DOCKER_DIR, __DOCKERFILE_TEMPLATE))
+    docker_template = Template(docker_template)
+    docker_template = docker_template.render(base_image=base_image, project=project_root)
+
+    # updating Dockerfile
+    with open(os.path.join(__DOCKER_DIR, __DOCKERFILE), 'w') as f:
+        f.write(docker_template)
 
 
 @cli.command()
