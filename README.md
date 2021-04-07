@@ -7,7 +7,10 @@
 ## Dependencies:
 * Python 3
 * `click`
+* `PyYAML>=5.4.1`
+* `papermill==2.2.0`
 * `papermill>=2.2.0` (`2.2.0` added `inspect_notebook`)
+
 
 ## Installation
 ```bash
@@ -34,12 +37,21 @@ Options:
 
 Commands:
   create   Creates the project root directory: <project_root> ├── README.md...
+  docker   updates the Dockerfile template with values from settings.yml...
   execute  Execute a .ipynb notebook :param notebook_path: path to the...
   specs    Generates the hysdsio and job specs for json files (in the
            docker...
 ```
 
 ## Generating a base Notebook PGE project
+The `Dockerfile` is generated through `jinja` templating by filling in values from a `settings.yml` file
+
+`settings.yml` file is fairly simple
+```yaml
+base_image: artifactory.com/nisar_ade:r1.3
+```
+Where `base_image` is the image which the container will be built from
+
 ```bash
 $ notebook-pge-wrapper create <project_name>
 ```
@@ -47,10 +59,18 @@ The following project structure will be generated
 ```
 <project_name>
 ├── README.md
-├── docker/
-│   └── Dockerfile
-└── notebook_pges/
+├── docker
+│   ├── Dockerfile
+│   └── Dockerfile.template
+├── notebook_pges
+└── settings.yml
 ```
+
+To update the `Dockerfile` with a new `base_image` run this command in the root directory of your project
+```bash
+$ notebook-pge-wrapper docker update
+```
+
 * `Dockerfile` will go through [container-builder](https://github.com/hysds/container-builder) to build the docker image
     * Will later be used to execute the notebook in a PGE setting
 * `notebook_pges/` is where all the Jupyter notebooks will be saved 

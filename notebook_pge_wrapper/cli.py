@@ -37,7 +37,7 @@ def read_settings(f):
 def read_docker_template(f):
     """
     reads docker template file
-    :param f:
+    :param f: file path to Dockerfile.template
     :return: str
     """
     with open(f, 'r') as f:
