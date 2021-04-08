@@ -1,2 +1,2 @@
 click>=7.1.2
-papermill==2.3.3
+papermill>=2.3.3

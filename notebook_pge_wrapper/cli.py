@@ -65,24 +65,24 @@ def create(project):
         os.mkdir(notebook_pges_directory)
 
     # create sample pge notebook
-    copyfile(sample_pge_notebook_file, os.path.join(notebook_pges_directory, __SAMPLE_PGE_NOTEBOOK_FILE))
+    copyfile(sample_pge_notebook_file, os.path.join(notebook_pges_directory, f'{project}_{__SAMPLE_PGE_NOTEBOOK_FILE}'))
 
     # create README.md
     copyfile(readme_file, os.path.join(project, __README_FILE))
 
     # create pge_create notebook
     pge_create_notebook_dest = os.path.join(project, __PGE_CREATE_NOTEBOOK_FILE)
-    with open(pge_create_notebook_file, 'r') as pge_create_infile, \
-            open(pge_create_notebook_dest, 'w+') as pge_create_outfile:
-        templated_pge_create_content = pge_create_infile.read().replace('PGE_NAME_PLACEHOLDER', project)
-        pge_create_outfile.write(templated_pge_create_content)
+    with open(pge_create_notebook_file, 'r') as fin, \
+            open(pge_create_notebook_dest, 'w+') as fout:
+        templated_pge_create_content = fin.read().replace('PGE_NAME_PLACEHOLDER', project)
+        fout.write(templated_pge_create_content)
 
     # create submit_job notebook
     submit_job_notebook_dest = os.path.join(project, __SUBMIT_JOB_NOTEBOOK_FILE)
-    with open(submit_job_notebook_file, 'r') as submit_job_infile, \
-            open(submit_job_notebook_dest, 'w+') as submit_job_outfile:
-        templated_submit_job_content = submit_job_infile.read().replace('PGE_NAME_PLACEHOLDER', project)
-        submit_job_outfile.write(templated_submit_job_content)
+    with open(submit_job_notebook_file, 'r') as fin, \
+            open(submit_job_notebook_dest, 'w+') as fout:
+        templated_submit_job_content = fin.read().replace('PGE_NAME_PLACEHOLDER', project)
+        fout.write(templated_submit_job_content)
 
 
 @cli.command()
