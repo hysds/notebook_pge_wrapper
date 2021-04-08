@@ -12,6 +12,7 @@ __README_FILE = 'README.md'
 __PGE_CREATE_NOTEBOOK_FILE = 'pge_create.ipynb'
 __SUBMIT_JOB_NOTEBOOK_FILE = 'submit_job.ipynb'
 __SAMPLE_PGE_NOTEBOOK_FILE = 'sample_pge.ipynb'
+__PELE_SETUP_NOTEBOOK_FILE = 'pele_setup.ipynb'
 
 
 @click.group()
@@ -30,6 +31,7 @@ def create(project):
     │   └── Dockerfile\n
     ├── pge_create.ipynb/\n
     ├── submit_job.ipynb/\n
+    ├── pele_setup.ipynb/\n
     └── notebook_pges/\n
         └── sample_pge.ipynb
 
@@ -49,6 +51,7 @@ def create(project):
     pge_create_notebook_file = os.path.join(templates, __PGE_CREATE_NOTEBOOK_FILE)
     submit_job_notebook_file = os.path.join(templates, __SUBMIT_JOB_NOTEBOOK_FILE)
     sample_pge_notebook_file = os.path.join(templates, __SAMPLE_PGE_NOTEBOOK_FILE)
+    pele_setup_notebook_file = os.path.join(templates, __PELE_SETUP_NOTEBOOK_FILE)
 
     if not os.path.exists(project):
         os.mkdir(project)
@@ -83,6 +86,9 @@ def create(project):
             open(submit_job_notebook_dest, 'w+') as fout:
         templated_submit_job_content = fin.read().replace('PGE_NAME_PLACEHOLDER', project)
         fout.write(templated_submit_job_content)
+
+    # create pele_setup notebook
+    copyfile(pele_setup_notebook_file, os.path.join(project_root, __PELE_SETUP_NOTEBOOK_FILE))
 
 
 @cli.command()
