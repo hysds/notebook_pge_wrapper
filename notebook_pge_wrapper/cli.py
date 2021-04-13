@@ -112,11 +112,9 @@ def create(project):
 
 
 @cli.command()
-@click.argument('update')
-def docker(update):
+def dockerfile():
     """
     updates the Dockerfile template with values from settings.yml
-    :param update:
     """
     base, project_root = os.path.split(os.getcwd())
 

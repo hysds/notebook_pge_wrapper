@@ -21,10 +21,11 @@ pip install -e .
 python setup.py install
 ```
 
-`notebook-pge-wrapper` will have 3 main sub-commands
+`notebook-pge-wrapper` will have 4 main sub-commands
 * `create` - generates a base skeleton project for end-users to develop notebook PGEs
 * `specs` - takes a `-n <path to notebook>` argument and generates a `hysdsio` and `job_spec` json file in the `docker/` directory
 * `execute` for notebook execution
+* `dockerfile`  updates the Dockerfile template with values from `settings.yml`
 
 ```bash
 $ notebook-pge-wrapper --help
@@ -36,11 +37,10 @@ Options:
   --help  Show this message and exit.
 
 Commands:
-  create   Creates the project root directory: <project_root> ├── README.md...
-  docker   updates the Dockerfile template with values from settings.yml...
-  execute  Execute a .ipynb notebook :param notebook_path: path to the...
-  specs    Generates the hysdsio and job specs for json files (in the
-           docker...
+  create      Creates the project root directory: <project_root> ├── README.md...
+  dockerfile  updates the Dockerfile template with values from settings.yml
+  execute     Execute a .ipynb notebook :param notebook_path: path to the...
+  specs       Generates the hysdsio and job specs for json files (in the docker...
 ```
 
 ## Generating a base Notebook PGE project
@@ -57,7 +57,7 @@ $ notebook-pge-wrapper create <project_name>
 ```
 The following project structure will be generated
 ```
-<project_name>
+.
 ├── README.md
 ├── docker
 │   ├── Dockerfile
@@ -66,9 +66,23 @@ The following project structure will be generated
 └── settings.yml
 ```
 
-To update the `Dockerfile` with a new `base_image` run this command in the root directory of your project
+* `Dockerfile` will go through [container-builder](https://github.com/hysds/container-builder) to build the docker image
+    * Will later be used to execute the notebook in a PGE setting
+* Place all your `.ipynb` files in `notebook_pges/`
+
+### Dockerfile
+The `notebook-pge-wrapper dockerfile` command will read in values from `settings.yml` and fill in the values in 
+`Dockerfile.template`
+
+To use a new docker image edit the `base_image` value in `settings.yml`
+
+```yaml
+base_image: artifactory.com/nisar_ade:r1.3
+```
+
+To update the `Dockerfile` with a new `base_image` run this command in the ***root*** directory of your project
 ```bash
-$ notebook-pge-wrapper docker update
+$ notebook-pge-wrapper dockerfile
 ```
 
 * `Dockerfile` will go through [container-builder](https://github.com/hysds/container-builder) to build the docker image

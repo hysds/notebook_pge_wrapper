@@ -6,15 +6,34 @@ $ notebook-pge-wrapper create <project_name>
 ```
 The following project structure will be generated
 ```
-<project_name>
+.
 ├── README.md
-├── docker/
-│   └── Dockerfile
-└── notebook_pges/
+├── docker
+│   ├── Dockerfile
+│   └── Dockerfile.template
+├── notebook_pges
+└── settings.yml
 ```
 * `Dockerfile` will go through [container-builder](https://github.com/hysds/container-builder) to build the docker image
     * Will later be used to execute the notebook in a PGE setting
 * Place all your `.ipynb` files in `notebook_pges/`
+
+
+### Dockerfile
+The `notebook-pge-wrapper dockerfile` command will read in values from `settings.yml` and fill in the values in 
+`Dockerfile.template`
+
+To use a new docker image edit the `base_image` value in `settings.yml`
+
+```yaml
+base_image: artifactory.com/nisar_ade:r1.3
+```
+
+To update the `Dockerfile` with a new `base_image` run this command in the ***root*** directory of your project
+```bash
+$ notebook-pge-wrapper dockerfile
+```
+
 
 ### Papermill
 Your notebooks will leverage `papermill` to execute notebooks
