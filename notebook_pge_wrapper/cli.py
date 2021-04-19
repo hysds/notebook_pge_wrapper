@@ -7,13 +7,16 @@ from jinja2 import Template
 from notebook_pge_wrapper.spec_generator import generate_spec_files
 from notebook_pge_wrapper.execute_notebook import execute as execute_notebook
 
-
 __SETTINGS = 'settings.yml'
 __NOTEBOOK_DIR = 'notebook_pges'
 __DOCKER_DIR = 'docker'
 __DOCKERFILE_TEMPLATE = 'Dockerfile.template'
 __DOCKERFILE = 'Dockerfile'
 __README_FILE = 'README.md'
+__PGE_CREATE_NOTEBOOK_FILE = 'pge_create.ipynb'
+__SUBMIT_JOB_NOTEBOOK_FILE = 'submit_job.ipynb'
+__SAMPLE_PGE_NOTEBOOK_FILE = 'sample_pge.ipynb'
+__PELE_SETUP_NOTEBOOK_FILE = 'pele_setup.ipynb'
 
 
 def read_settings(f):
@@ -58,7 +61,11 @@ def create(project):
     ├── README.md\n
     ├── docker/\n
     │   └── Dockerfile\n
-    └── notebook_pges/
+    ├── pge_create.ipynb/\n
+    ├── submit_job.ipynb/\n
+    ├── pele_setup.ipynb/\n
+    └── notebook_pges/\n
+        └── sample_pge.ipynb
 
     :param project: New notebook project name (or path)
     """
@@ -72,6 +79,10 @@ def create(project):
 
     templates = os.path.join(project_root, '..', 'templates')
     readme_file = os.path.join(templates, __README_FILE)
+    pge_create_notebook_file = os.path.join(templates, __PGE_CREATE_NOTEBOOK_FILE)
+    submit_job_notebook_file = os.path.join(templates, __SUBMIT_JOB_NOTEBOOK_FILE)
+    sample_pge_notebook_file = os.path.join(templates, __SAMPLE_PGE_NOTEBOOK_FILE)
+    pele_setup_notebook_file = os.path.join(templates, __PELE_SETUP_NOTEBOOK_FILE)
 
     if not os.path.exists(project):
         os.mkdir(project)
@@ -100,6 +111,26 @@ def create(project):
     # create notebook_pges directory
     if not os.path.exists(notebook_pges_directory):
         os.mkdir(notebook_pges_directory)
+
+    # create pge_create notebook
+    pge_create_notebook_dest = os.path.join(project, __PGE_CREATE_NOTEBOOK_FILE)
+    with open(pge_create_notebook_file, 'r') as fin, \
+            open(pge_create_notebook_dest, 'w+') as fout:
+        templated_pge_create_content = fin.read().replace('PGE_NAME_PLACEHOLDER', project)
+        fout.write(templated_pge_create_content)
+
+    # create submit_job notebook
+    submit_job_notebook_dest = os.path.join(project, __SUBMIT_JOB_NOTEBOOK_FILE)
+    with open(submit_job_notebook_file, 'r') as fin, \
+            open(submit_job_notebook_dest, 'w+') as fout:
+        templated_submit_job_content = fin.read().replace('PGE_NAME_PLACEHOLDER', project)
+        fout.write(templated_submit_job_content)
+
+    # create pele_setup notebook
+    copyfile(pele_setup_notebook_file, os.path.join(project_root, __PELE_SETUP_NOTEBOOK_FILE))
+        
+    # create sample pge notebook
+    copyfile(sample_pge_notebook_file, os.path.join(notebook_pges_directory, f'{project}_{__SAMPLE_PGE_NOTEBOOK_FILE}'))
 
     # create README.md
     copyfile(readme_file, os.path.join(project, __README_FILE))

@@ -57,12 +57,15 @@ $ notebook-pge-wrapper create <project_name>
 ```
 The following project structure will be generated
 ```
-.
+<project_root>
 ├── README.md
 ├── docker
 │   ├── Dockerfile
 │   └── Dockerfile.template
+├── pge_create.ipynb
+├── submit_job.ipynb
 ├── notebook_pges
+│   └── sample_pge.ipynb
 └── settings.yml
 ```
 
@@ -92,8 +95,7 @@ $ notebook-pge-wrapper dockerfile
 
 ## HySDS job specs generation
 * Tag the top notebook cell with `parameters`
-* prepend any hysds specification fields with `_` and `extract_hysds_specs` will populate `hysds-io` and
-`job_specs` with it's specified values
+* prepend any hysds specification fields with `_` and `extract_hysds_specs` will populate `hysds-io` and `job_specs` with it's specified values
     * If not found it will set to `default` values (ie. `time_limit: 3600`)
 ```
 # job_specs
