@@ -127,7 +127,7 @@ def create(project):
         fout.write(templated_submit_job_content)
 
     # create pele_setup notebook
-    copyfile(pele_setup_notebook_file, os.path.join(project_root, __PELE_SETUP_NOTEBOOK_FILE))
+    copyfile(pele_setup_notebook_file, os.path.join(project, __PELE_SETUP_NOTEBOOK_FILE))
         
     # create sample pge notebook
     copyfile(sample_pge_notebook_file, os.path.join(notebook_pges_directory, f'{project}_{__SAMPLE_PGE_NOTEBOOK_FILE}'))
