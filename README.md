@@ -49,8 +49,11 @@ The `Dockerfile` is generated through `jinja` templating by filling in values fr
 `settings.yml` file is fairly simple
 ```yaml
 base_image: artifactory.com/nisar_ade:r1.3
+user: jovyan
 ```
-Where `base_image` is the image which the container will be built from
+Where `base_image` is the image which the container will be built from and `user` in the docker image
+
+*if `settings.yml` is not found in `~/.config/notebook-pge-wrapper` it will copy it over from `templates/`*
 
 ```bash
 $ notebook-pge-wrapper create <project_name>
