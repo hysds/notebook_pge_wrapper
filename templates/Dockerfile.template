@@ -13,7 +13,7 @@ USER {{ user }}
 # RUN cd $HOME \
 #     && git clone https://github.com/hysds/notebook_pge_wrapper.git \
 #     && cd notebook_pge_wrapper \
-#     && $HOME/verdi/bin/pip install -e .
+#     && $CONDA_DIR/bin/pip install -e .
 
 COPY . $HOME/{{ project }}
 
