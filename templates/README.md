@@ -43,6 +43,14 @@ Your notebooks will leverage `papermill` to execute notebooks
     * Adding a comment, ie. `x = 34  # type: int`
     * [Python type hinting](https://docs.python.org/3/library/typing.html) (introduced in python 3.5)
 
+### Requirements.ipynb
+`requirements.ipynb` is used to install additional dependencies in the docker image
+
+It's separated into 3 sections:
+* CentOS installation (`sudo yum install <package> -y`)
+* Conda installtion (`sudo conda install <package> -y`)
+* Python library installation (`sudo pip install <package>`)
+
 ### HySDS job specs generation
 * Tag the top notebook cell with `parameters`
     * To add tags in your notebook, go to the toolbar: `View` -> `Cell Toolbar` -> `Tags`

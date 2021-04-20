@@ -17,6 +17,9 @@ __DOCKER_DIR = 'docker'
 __DOCKERFILE_TEMPLATE = 'Dockerfile.template'
 __DOCKERFILE = 'Dockerfile'
 __README_FILE = 'README.md'
+
+__REQUIREMENTS = 'requirements.ipynb'
+
 __PGE_CREATE_NOTEBOOK_FILE = 'pge_create.ipynb'
 __SUBMIT_JOB_NOTEBOOK_FILE = 'submit_job.ipynb'
 __SAMPLE_PGE_NOTEBOOK_FILE = 'sample_pge.ipynb'
@@ -58,7 +61,8 @@ def cli():
 
 @cli.command()
 @click.argument('project')
-def create(project):
+@click.option('--settings', default=None)
+def create(project, settings):
     """
     Creates the project root directory:\n
     <project_root>\n
@@ -72,6 +76,7 @@ def create(project):
         └── sample_pge.ipynb
 
     :param project: New notebook project name (or path)
+    :param settings: location of settings.yml, will use ~/.config/notebook-pge-wrapper/settings.yml if not supplied
     """
     if not project:
         raise RuntimeError("project must be supplied, ie. notebook-pge-wrapper create <project_root>")
@@ -144,6 +149,12 @@ def create(project):
     copyfile(
         os.path.join(__SETTINGS_LOC),
         os.path.join(project, __SETTINGS)
+    )
+
+    # copy requirements.ipynb file
+    copyfile(
+        os.path.join(templates, __REQUIREMENTS),
+        os.path.join(project, __DOCKER_DIR,  __REQUIREMENTS)
     )
 
 

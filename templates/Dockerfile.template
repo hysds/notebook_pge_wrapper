@@ -17,6 +17,9 @@ USER {{ user }}
 
 COPY . $HOME/{{ project }}
 
+# installing user defined dependencies
+RUN $CONDA_DIR/bin/papermill $HOME/{{ project }}/docker/requirements.ipynb /tmp/requirements_output.ipynb --log-output
+
 WORKDIR $HOME
 
 CMD ["/bin/bash", "--login"]
