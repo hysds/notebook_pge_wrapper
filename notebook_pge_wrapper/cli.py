@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 from shutil import copyfile
 import yaml
 import click
@@ -8,6 +9,9 @@ from notebook_pge_wrapper.spec_generator import generate_spec_files
 from notebook_pge_wrapper.execute_notebook import execute as execute_notebook
 
 __SETTINGS = 'settings.yml'
+__SETTINGS_DIR = os.path.join(str(Path.home()), '.config/notebook-pge-wrapper')
+__SETTINGS_LOC = os.path.join(__SETTINGS_DIR, __SETTINGS)
+
 __NOTEBOOK_DIR = 'notebook_pges'
 __DOCKER_DIR = 'docker'
 __DOCKERFILE_TEMPLATE = 'Dockerfile.template'
@@ -91,12 +95,13 @@ def create(project):
     if not os.path.exists(docker_directory):
         os.mkdir(docker_directory)
 
-    settings = read_settings(os.path.join(templates, __SETTINGS))
+    settings = read_settings(os.path.join(__SETTINGS_LOC))
     base_image = settings['base_image']
+    user = settings['user']
 
     docker_template = read_docker_template(os.path.join(templates, __DOCKERFILE_TEMPLATE))
     docker_template = Template(docker_template)
-    docker_template = docker_template.render(base_image=base_image, project=project)
+    docker_template = docker_template.render(base_image=base_image, user=user, project=project)
 
     # create Dockerfile
     with open(os.path.join(docker_directory, __DOCKERFILE), 'w') as f:
@@ -137,7 +142,7 @@ def create(project):
 
     # copy settings file
     copyfile(
-        os.path.join(templates, __SETTINGS),
+        os.path.join(__SETTINGS_LOC),
         os.path.join(project, __SETTINGS)
     )
 
@@ -149,7 +154,7 @@ def dockerfile():
     """
     base, project_root = os.path.split(os.getcwd())
 
-    settings = read_settings(__SETTINGS)
+    settings = read_settings(__SETTINGS_LOC)
     base_image = settings['base_image']
 
     docker_template = read_docker_template(os.path.join(__DOCKER_DIR, __DOCKERFILE_TEMPLATE))
