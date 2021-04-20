@@ -44,6 +44,20 @@ Commands:
 ```
 
 ## Generating a base Notebook PGE project
+```bash
+$ notebook-pge-wrapper create --help
+Usage: notebook-pge-wrapper create [OPTIONS] PROJECT
+
+  Creates the project root directory:
+
+Options:
+  -s, --settings TEXT  (optional) path to settings.yml, will default to
+                       ~/.config/notebook-pge-wrapper/settings.yml if not
+                       supplied
+
+  --help               Show this message and exit.
+```
+
 The `Dockerfile` is generated through `jinja` templating by filling in values from a `settings.yml` file
 
 `settings.yml` file is fairly simple
@@ -60,16 +74,16 @@ $ notebook-pge-wrapper create <project_name>
 ```
 The following project structure will be generated
 ```
-<project_root>
+.
 ├── README.md
 ├── docker
 │   ├── Dockerfile
 │   └── Dockerfile.template
-├── pge_create.ipynb
-├── submit_job.ipynb
 ├── notebook_pges
-│   └── sample_pge.ipynb
-└── settings.yml
+│   └── test_nb_sample_pge.ipynb
+├── pele_setup.ipynb
+├── pge_create.ipynb
+└── submit_job.ipynb
 ```
 
 * `Dockerfile` will go through [container-builder](https://github.com/hysds/container-builder) to build the docker image
@@ -84,11 +98,20 @@ To use a new docker image edit the `base_image` value in `settings.yml`
 
 ```yaml
 base_image: artifactory.com/nisar_ade:r1.3
+user: jovyan
 ```
 
 To update the `Dockerfile` with a new `base_image` run this command in the ***root*** directory of your project
 ```bash
-$ notebook-pge-wrapper dockerfile
+$ notebook-pge-wrapper dockerfile --help
+Usage: notebook-pge-wrapper dockerfile [OPTIONS]
+
+  updates the Dockerfile template with values from settings.yml
+
+Options:
+  -s, --settings TEXT  (optional) path to settings.yml, will default to
+                       ~/.config/notebook-pge-wrapper/settings.yml if not
+                       supplied
 ```
 
 * `Dockerfile` will go through [container-builder](https://github.com/hysds/container-builder) to build the docker image

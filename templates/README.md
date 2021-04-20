@@ -12,7 +12,10 @@ The following project structure will be generated
 │   ├── Dockerfile
 │   └── Dockerfile.template
 ├── notebook_pges
-└── settings.yml
+│   └── test_nb_sample_pge.ipynb
+├── pele_setup.ipynb
+├── pge_create.ipynb
+└── submit_job.ipynb
 ```
 * `Dockerfile` will go through [container-builder](https://github.com/hysds/container-builder) to build the docker image
     * Will later be used to execute the notebook in a PGE setting
