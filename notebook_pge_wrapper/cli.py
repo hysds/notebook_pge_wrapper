@@ -8,6 +8,7 @@ from jinja2 import Template
 from notebook_pge_wrapper.spec_generator import generate_spec_files
 from notebook_pge_wrapper.execute_notebook import execute as execute_notebook
 
+
 __SETTINGS = 'settings.yml'
 __SETTINGS_DIR = os.path.join(str(Path.home()), '.config/notebook-pge-wrapper')
 __SETTINGS_LOC = os.path.join(__SETTINGS_DIR, __SETTINGS)
@@ -21,6 +22,20 @@ __PGE_CREATE_NOTEBOOK_FILE = 'pge_create.ipynb'
 __SUBMIT_JOB_NOTEBOOK_FILE = 'submit_job.ipynb'
 __SAMPLE_PGE_NOTEBOOK_FILE = 'sample_pge.ipynb'
 __PELE_SETUP_NOTEBOOK_FILE = 'pele_setup.ipynb'
+
+
+def settings_check():
+    if not os.path.exists(__SETTINGS_DIR):
+        print('%s not found, creating directory..' % __SETTINGS_DIR)
+        os.makedirs(__SETTINGS_DIR)
+
+    if not Path(os.path.join(__SETTINGS_DIR, 'settings.yml')).is_file():
+        print('settings.yml not found, copying from library template (please revise)')
+        package_root = os.path.dirname(os.path.abspath(__file__))
+        copyfile(
+            os.path.join(package_root, '..', 'templates', 'settings.yml'),
+            os.path.join(__SETTINGS_DIR, 'settings.yml')
+        )
 
 
 def read_settings(f):
@@ -58,7 +73,9 @@ def cli():
 
 @cli.command()
 @click.argument('project')
-def create(project):
+@click.option('--settings', '-s', default=None, help="(optional) path to settings.yml, will default to "
+                                                     "~/.config/notebook-pge-wrapper/settings.yml if not supplied")
+def create(project, settings=None):
     """
     Creates the project root directory:\n
     <project_root>\n
@@ -70,8 +87,6 @@ def create(project):
     ├── pele_setup.ipynb/\n
     └── notebook_pges/\n
         └── sample_pge.ipynb
-
-    :param project: New notebook project name (or path)
     """
     if not project:
         raise RuntimeError("project must be supplied, ie. notebook-pge-wrapper create <project_root>")
@@ -88,6 +103,12 @@ def create(project):
     sample_pge_notebook_file = os.path.join(templates, __SAMPLE_PGE_NOTEBOOK_FILE)
     pele_setup_notebook_file = os.path.join(templates, __PELE_SETUP_NOTEBOOK_FILE)
 
+    if settings is None:
+        settings_check()
+        settings_data = read_settings(__SETTINGS_LOC)
+    else:
+        settings_data = read_settings(settings)
+
     if not os.path.exists(project):
         os.mkdir(project)
 
@@ -95,9 +116,8 @@ def create(project):
     if not os.path.exists(docker_directory):
         os.mkdir(docker_directory)
 
-    settings = read_settings(os.path.join(__SETTINGS_LOC))
-    base_image = settings['base_image']
-    user = settings['user']
+    base_image = settings_data['base_image']
+    user = settings_data['user']
 
     docker_template = read_docker_template(os.path.join(templates, __DOCKERFILE_TEMPLATE))
     docker_template = Template(docker_template)
@@ -140,26 +160,27 @@ def create(project):
     # create README.md
     copyfile(readme_file, os.path.join(project, __README_FILE))
 
-    # copy settings file
-    copyfile(
-        os.path.join(__SETTINGS_LOC),
-        os.path.join(project, __SETTINGS)
-    )
-
 
 @cli.command()
-def dockerfile():
+@click.option('--settings', '-s', default=None, help="(optional) path to settings.yml, will default to "
+                                                     "~/.config/notebook-pge-wrapper/settings.yml if not supplied")
+def dockerfile(settings=None):
     """
     updates the Dockerfile template with values from settings.yml
     """
     base, project_root = os.path.split(os.getcwd())
 
-    settings = read_settings(__SETTINGS_LOC)
-    base_image = settings['base_image']
+    if settings is None:
+        settings_check()
+        settings_data = read_settings(__SETTINGS_LOC)
+    else:
+        settings_data = read_settings(settings)
+    base_image = settings_data['base_image']
+    user = settings_data['user']
 
     docker_template = read_docker_template(os.path.join(__DOCKER_DIR, __DOCKERFILE_TEMPLATE))
     docker_template = Template(docker_template)
-    docker_template = docker_template.render(base_image=base_image, project=project_root)
+    docker_template = docker_template.render(base_image=base_image, user=user, project=project_root)
 
     # updating Dockerfile
     with open(os.path.join(__DOCKER_DIR, __DOCKERFILE), 'w') as f:
@@ -173,8 +194,6 @@ def specs(notebook_path):
     Generates the hysdsio and job specs for json files (in the docker directory) for a notebook \n
     enter "all" to generate all spec files in notebook_pges/ \n
     ie. notebook-pge-wrapper specs <notebook_path or all>
-
-    :param notebook_path: path to the .ipynb file
     """
     if notebook_path == "all":
         for nb in os.listdir('notebook_pges'):  # iterate through notebook_pges/ directory
