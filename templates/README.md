@@ -30,6 +30,7 @@ To use a new docker image edit the `base_image` value in `settings.yml`
 
 ```yaml
 base_image: artifactory.com/nisar_ade:r1.3
+user: jovyan
 ```
 
 To update the `Dockerfile` with a new `base_image` run this command in the ***root*** directory of your project

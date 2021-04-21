@@ -119,6 +119,15 @@ Options:
 * `notebook_pges/` is where all the Jupyter notebooks will be saved 
 
 
+#### Requirements.ipynb
+`requirements.ipynb` is used to install additional dependencies in the newly created project
+
+It's separated into 3 sections:
+* CentOS installation (`sudo yum install <package> -y`)
+* Conda installtion (`sudo conda install <package> -y`)
+* Python library installation (`sudo pip install <package>`)
+
+
 ## HySDS job specs generation
 * Tag the top notebook cell with `parameters`
 * prepend any hysds specification fields with `_` and `extract_hysds_specs` will populate `hysds-io` and `job_specs` with it's specified values
