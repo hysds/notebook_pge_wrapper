@@ -136,6 +136,12 @@ def create(project, settings=None):
         os.path.join(project, __DOCKER_DIR, __DOCKERFILE_TEMPLATE)
     )
 
+    # copy requirements.ipynb to project
+    copyfile(
+        os.path.join(templates, __REQUIREMENTS),
+        os.path.join(project, __DOCKER_DIR, __REQUIREMENTS)
+    )
+
     # create notebook_pges directory
     if not os.path.exists(notebook_pges_directory):
         os.mkdir(notebook_pges_directory)
