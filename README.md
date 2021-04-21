@@ -7,7 +7,10 @@
 ## Dependencies:
 * Python 3
 * `click`
+* `PyYAML>=5.4.1`
+* `papermill==2.2.0`
 * `papermill>=2.2.0` (`2.2.0` added `inspect_notebook`)
+
 
 ## Installation
 ```bash
@@ -18,10 +21,11 @@ pip install -e .
 python setup.py install
 ```
 
-`notebook-pge-wrapper` will have 3 main sub-commands
+`notebook-pge-wrapper` will have 4 main sub-commands
 * `create` - generates a base skeleton project for end-users to develop notebook PGEs
 * `specs` - takes a `-n <path to notebook>` argument and generates a `hysdsio` and `job_spec` json file in the `docker/` directory
 * `execute` for notebook execution
+* `dockerfile`  updates the Dockerfile template with values from `settings.yml`
 
 ```bash
 $ notebook-pge-wrapper --help
@@ -33,27 +37,83 @@ Options:
   --help  Show this message and exit.
 
 Commands:
-  create   Creates the project root directory: <project_root> ├── README.md...
-  execute  Execute a .ipynb notebook :param notebook_path: path to the...
-  specs    Generates the hysdsio and job specs for json files (in the
-           docker...
+  create      Creates the project root directory: <project_root> ├── README.md...
+  dockerfile  updates the Dockerfile template with values from settings.yml
+  execute     Execute a .ipynb notebook :param notebook_path: path to the...
+  specs       Generates the hysdsio and job specs for json files (in the docker...
 ```
 
 ## Generating a base Notebook PGE project
+```bash
+$ notebook-pge-wrapper create --help
+Usage: notebook-pge-wrapper create [OPTIONS] PROJECT
+
+  Creates the project root directory:
+
+Options:
+  -s, --settings TEXT  (optional) path to settings.yml, will default to
+                       ~/.config/notebook-pge-wrapper/settings.yml if not
+                       supplied
+
+  --help               Show this message and exit.
+```
+
+The `Dockerfile` is generated through `jinja` templating by filling in values from a `settings.yml` file
+
+`settings.yml` file is fairly simple
+```yaml
+base_image: artifactory.com/nisar_ade:r1.3
+user: jovyan
+```
+Where `base_image` is the image which the container will be built from and `user` in the docker image
+
+*if `settings.yml` is not found in `~/.config/notebook-pge-wrapper` it will copy it over from `templates/`*
+
 ```bash
 $ notebook-pge-wrapper create <project_name>
 ```
 The following project structure will be generated
 ```
-<project_root>\n
-├── README.md\n
-├── docker/\n
-│   └── Dockerfile\n
-├── pge_create.ipynb/\n
-├── submit_job.ipynb/\n
-└── notebook_pges/\n
-    └── sample_pge.ipynb
+.
+├── README.md
+├── docker
+│   ├── Dockerfile
+│   └── Dockerfile.template
+├── notebook_pges
+│   └── test_nb_sample_pge.ipynb
+├── pele_setup.ipynb
+├── pge_create.ipynb
+└── submit_job.ipynb
 ```
+
+* `Dockerfile` will go through [container-builder](https://github.com/hysds/container-builder) to build the docker image
+    * Will later be used to execute the notebook in a PGE setting
+* Place all your `.ipynb` files in `notebook_pges/`
+
+### Dockerfile
+The `notebook-pge-wrapper dockerfile` command will read in values from `settings.yml` and fill in the values in 
+`Dockerfile.template`
+
+To use a new docker image edit the `base_image` value in `settings.yml`
+
+```yaml
+base_image: artifactory.com/nisar_ade:r1.3
+user: jovyan
+```
+
+To update the `Dockerfile` with a new `base_image` run this command in the ***root*** directory of your project
+```bash
+$ notebook-pge-wrapper dockerfile --help
+Usage: notebook-pge-wrapper dockerfile [OPTIONS]
+
+  updates the Dockerfile template with values from settings.yml
+
+Options:
+  -s, --settings TEXT  (optional) path to settings.yml, will default to
+                       ~/.config/notebook-pge-wrapper/settings.yml if not
+                       supplied
+```
+
 * `Dockerfile` will go through [container-builder](https://github.com/hysds/container-builder) to build the docker image
     * Will later be used to execute the notebook in a PGE setting
 * `notebook_pges/` is where all the Jupyter notebooks will be saved 
