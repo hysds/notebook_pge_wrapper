@@ -259,7 +259,7 @@ def generate_job_spec(time_limit=__DEFAULT_TIME_LIMIT, soft_time_limit=__DEFAULT
         'disk_usage': disk_usage,
         'required_queues': required_queue,
         'imported_worker_files': {
-            "$HOME/.aws": "/home/ops/.aws"
+            "$HOME/.aws": "/home/%s/.aws" % user
         },
         'params': params
     }
