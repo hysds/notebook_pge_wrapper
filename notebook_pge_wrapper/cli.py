@@ -26,6 +26,9 @@ __SUBMIT_JOB_NOTEBOOK_FILE = 'submit_job.ipynb'
 __SAMPLE_PGE_NOTEBOOK_FILE = 'sample_pge.ipynb'
 __PELE_SETUP_NOTEBOOK_FILE = 'pele_setup.ipynb'
 
+__SETTINGS_DESCRIPTION = "(optional) path to settings.yml, will default to " \
+                         "~/.config/notebook-pge-wrapper/settings.yml if not supplied"
+
 
 def settings_check():
     if not os.path.exists(__SETTINGS_DIR):
@@ -76,8 +79,7 @@ def cli():
 
 @cli.command()
 @click.argument('project')
-@click.option('--settings', '-s', default=None, help="(optional) path to settings.yml, will default to "
-                                                     "~/.config/notebook-pge-wrapper/settings.yml if not supplied")
+@click.option('--settings', '-s', default=None, help=__SETTINGS_DESCRIPTION)
 def create(project, settings=None):
     """
     Creates the project root directory:\n
@@ -171,8 +173,7 @@ def create(project, settings=None):
 
 
 @cli.command()
-@click.option('--settings', '-s', default=None, help="(optional) path to settings.yml, will default to "
-                                                     "~/.config/notebook-pge-wrapper/settings.yml if not supplied")
+@click.option('--settings', '-s', default=None, help=__SETTINGS_DESCRIPTION)
 def dockerfile(settings=None):
     """
     updates the Dockerfile template with values from settings.yml
@@ -198,19 +199,27 @@ def dockerfile(settings=None):
 
 @cli.command()
 @click.argument('notebook_path')
-def specs(notebook_path):
+@click.option('--settings', '-s', default=None, help=__SETTINGS_DESCRIPTION)
+def specs(notebook_path, settings=None):
     """
     Generates the hysdsio and job specs for json files (in the docker directory) for a notebook \n
     enter "all" to generate all spec files in notebook_pges/ \n
     ie. notebook-pge-wrapper specs <notebook_path or all>
     """
+    if settings is None:
+        settings_check()
+        settings_data = read_settings(__SETTINGS_LOC)
+    else:
+        settings_data = read_settings(settings)
+    user = settings_data['user']
+
     if notebook_path == "all":
         for nb in os.listdir('notebook_pges'):  # iterate through notebook_pges/ directory
             if not nb.endswith('.ipynb'):
                 print('%s is not a notebook, skipping...' % nb)
                 continue
             print('inspecting notebook: %s' % nb)
-            generate_spec_files(nb)
+            generate_spec_files(nb, user)
     else:
         if not os.path.isfile(notebook_path):
             raise RuntimeError("notebook %s not found" % notebook_path)
@@ -218,7 +227,7 @@ def specs(notebook_path):
         nb = notebook_path.split('/')
         nb = nb[1]
         print('inspecting notebook: %s' % nb)
-        generate_spec_files(nb)
+        generate_spec_files(nb, user)
 
 
 @cli.command()

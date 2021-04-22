@@ -211,7 +211,7 @@ def generate_hysdsio(job_label=None, sub_type=None, nb_name=None):
 
 
 def generate_job_spec(time_limit=__DEFAULT_TIME_LIMIT, soft_time_limit=__DEFAULT_SOFT_TIME_LIMIT,
-                      disk_usage=__DEFAULT_DISK_USAGE, required_queue=None, nb=None, command=None):
+                      disk_usage=__DEFAULT_DISK_USAGE, required_queue=None, nb=None, command=None, user="ops"):
     """
     example: {
         "required_queues":["system-jobs-queue"],
@@ -227,6 +227,7 @@ def generate_job_spec(time_limit=__DEFAULT_TIME_LIMIT, soft_time_limit=__DEFAULT
     :param required_queue: str or List[str]
     :param nb: str, path of Jupyter notebook
     :param command: str, command field in job_specs json
+    :param user: user/directory in the docker image
     :return: Dict[str, <any>]
     """
     if required_queue is None:
@@ -252,7 +253,7 @@ def generate_job_spec(time_limit=__DEFAULT_TIME_LIMIT, soft_time_limit=__DEFAULT
     pge_verdi_path = os.path.join(repo, nb)
 
     output_job_spec = {
-        'command': command or 'notebook-pge-wrapper execute /home/ops/%s' % pge_verdi_path,
+        'command': command or 'notebook-pge-wrapper execute /home/%s/%s' % (user, pge_verdi_path),
         'time_limit': time_limit,
         'soft_time_limit': soft_time_limit,
         'disk_usage': disk_usage,
@@ -265,7 +266,7 @@ def generate_job_spec(time_limit=__DEFAULT_TIME_LIMIT, soft_time_limit=__DEFAULT
     return output_job_spec
 
 
-def generate_spec_files(nb):
+def generate_spec_files(nb, user):
     nb_split = nb.split('.')
     root_name = nb_split[0]
 
@@ -289,7 +290,7 @@ def generate_spec_files(nb):
 
     # generate job_specs, copying job_specs.json to docker/
     job_spec = generate_job_spec(nb=nb_path, soft_time_limit=soft_time_limit, time_limit=time_limit,
-                                 required_queue=required_queue, disk_usage=disk_usage, command=command)
+                                 required_queue=required_queue, disk_usage=disk_usage, command=command, user=user)
     job_spec_file = 'job-spec.json.%s' % root_name
     job_spec_file_location = os.path.join('docker', job_spec_file)
 
