@@ -108,5 +108,10 @@ Usage: notebook-pge-wrapper specs [OPTIONS] NOTEBOOK_PATH
 
   ie. notebook-pge-wrapper specs <notebook_path or all>
 
-  :param notebook_path: str :return: None
+Options:
+  -s, --settings TEXT  (optional) path to settings.yml, will default to
+                       ~/.config/notebook-pge-wrapper/settings.yml if not
+                       supplied
+
+  --help               Show this message and exit.
 ```
