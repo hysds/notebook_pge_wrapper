@@ -18,10 +18,16 @@ __DOCKER_DIR = 'docker'
 __DOCKERFILE_TEMPLATE = 'Dockerfile.template'
 __DOCKERFILE = 'Dockerfile'
 __README_FILE = 'README.md'
+
+__REQUIREMENTS = 'requirements.ipynb'
+
 __PGE_CREATE_NOTEBOOK_FILE = 'pge_create.ipynb'
 __SUBMIT_JOB_NOTEBOOK_FILE = 'submit_job.ipynb'
 __SAMPLE_PGE_NOTEBOOK_FILE = 'sample_pge.ipynb'
 __PELE_SETUP_NOTEBOOK_FILE = 'pele_setup.ipynb'
+
+__SETTINGS_DESCRIPTION = "(optional) path to settings.yml, will default to " \
+                         "~/.config/notebook-pge-wrapper/settings.yml if not supplied"
 
 
 def settings_check():
@@ -73,8 +79,7 @@ def cli():
 
 @cli.command()
 @click.argument('project')
-@click.option('--settings', '-s', default=None, help="(optional) path to settings.yml, will default to "
-                                                     "~/.config/notebook-pge-wrapper/settings.yml if not supplied")
+@click.option('--settings', '-s', default=None, help=__SETTINGS_DESCRIPTION)
 def create(project, settings=None):
     """
     Creates the project root directory:\n
@@ -130,7 +135,13 @@ def create(project, settings=None):
     # copy Dockerfile.template to project
     copyfile(
         os.path.join(templates, __DOCKERFILE_TEMPLATE),
-        os.path.join(project, __DOCKER_DIR, __DOCKERFILE_TEMPLATE)
+        os.path.join(project, __DOCKERFILE_TEMPLATE)
+    )
+
+    # copy requirements.ipynb to project
+    copyfile(
+        os.path.join(templates, __REQUIREMENTS),
+        os.path.join(project, __DOCKER_DIR, __REQUIREMENTS)
     )
 
     # create notebook_pges directory
@@ -162,8 +173,7 @@ def create(project, settings=None):
 
 
 @cli.command()
-@click.option('--settings', '-s', default=None, help="(optional) path to settings.yml, will default to "
-                                                     "~/.config/notebook-pge-wrapper/settings.yml if not supplied")
+@click.option('--settings', '-s', default=None, help=__SETTINGS_DESCRIPTION)
 def dockerfile(settings=None):
     """
     updates the Dockerfile template with values from settings.yml
@@ -178,7 +188,7 @@ def dockerfile(settings=None):
     base_image = settings_data['base_image']
     user = settings_data['user']
 
-    docker_template = read_docker_template(os.path.join(__DOCKER_DIR, __DOCKERFILE_TEMPLATE))
+    docker_template = read_docker_template(__DOCKERFILE_TEMPLATE)
     docker_template = Template(docker_template)
     docker_template = docker_template.render(base_image=base_image, user=user, project=project_root)
 
@@ -189,19 +199,27 @@ def dockerfile(settings=None):
 
 @cli.command()
 @click.argument('notebook_path')
-def specs(notebook_path):
+@click.option('--settings', '-s', default=None, help=__SETTINGS_DESCRIPTION)
+def specs(notebook_path, settings=None):
     """
     Generates the hysdsio and job specs for json files (in the docker directory) for a notebook \n
     enter "all" to generate all spec files in notebook_pges/ \n
     ie. notebook-pge-wrapper specs <notebook_path or all>
     """
+    if settings is None:
+        settings_check()
+        settings_data = read_settings(__SETTINGS_LOC)
+    else:
+        settings_data = read_settings(settings)
+    user = settings_data['user']
+
     if notebook_path == "all":
         for nb in os.listdir('notebook_pges'):  # iterate through notebook_pges/ directory
             if not nb.endswith('.ipynb'):
                 print('%s is not a notebook, skipping...' % nb)
                 continue
             print('inspecting notebook: %s' % nb)
-            generate_spec_files(nb)
+            generate_spec_files(nb, user)
     else:
         if not os.path.isfile(notebook_path):
             raise RuntimeError("notebook %s not found" % notebook_path)
@@ -209,7 +227,7 @@ def specs(notebook_path):
         nb = notebook_path.split('/')
         nb = nb[1]
         print('inspecting notebook: %s' % nb)
-        generate_spec_files(nb)
+        generate_spec_files(nb, user)
 
 
 @cli.command()

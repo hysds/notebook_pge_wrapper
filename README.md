@@ -75,10 +75,11 @@ $ notebook-pge-wrapper create <project_name>
 The following project structure will be generated
 ```
 .
+├── Dockerfile.template
 ├── README.md
 ├── docker
 │   ├── Dockerfile
-│   └── Dockerfile.template
+│   └── requirements.ipynb
 ├── notebook_pges
 │   └── test_nb_sample_pge.ipynb
 ├── pele_setup.ipynb
@@ -117,6 +118,15 @@ Options:
 * `Dockerfile` will go through [container-builder](https://github.com/hysds/container-builder) to build the docker image
     * Will later be used to execute the notebook in a PGE setting
 * `notebook_pges/` is where all the Jupyter notebooks will be saved 
+
+
+#### Requirements.ipynb
+`requirements.ipynb` is used to install additional dependencies in the newly created project
+
+It's separated into 3 sections:
+* CentOS installation (`sudo yum install <package> -y`)
+* Conda installtion (`sudo conda install <package> -y`)
+* Python library installation (`sudo pip install <package>`)
 
 
 ## HySDS job specs generation
@@ -187,7 +197,12 @@ Usage: notebook-pge-wrapper specs [OPTIONS] NOTEBOOK_PATH
 
   ie. notebook-pge-wrapper specs <notebook_path or all>
 
-  :param notebook_path: str :return: None
+Options:
+  -s, --settings TEXT  (optional) path to settings.yml, will default to
+                       ~/.config/notebook-pge-wrapper/settings.yml if not
+                       supplied
+
+  --help               Show this message and exit.
 ```
 
 

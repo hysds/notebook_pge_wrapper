@@ -7,10 +7,11 @@ $ notebook-pge-wrapper create <project_name>
 The following project structure will be generated
 ```
 .
+├── Dockerfile.template
 ├── README.md
 ├── docker
 │   ├── Dockerfile
-│   └── Dockerfile.template
+│   └── requirements.ipynb
 ├── notebook_pges
 │   └── test_nb_sample_pge.ipynb
 ├── pele_setup.ipynb
@@ -30,6 +31,7 @@ To use a new docker image edit the `base_image` value in `settings.yml`
 
 ```yaml
 base_image: artifactory.com/nisar_ade:r1.3
+user: jovyan
 ```
 
 To update the `Dockerfile` with a new `base_image` run this command in the ***root*** directory of your project
@@ -45,6 +47,14 @@ Your notebooks will leverage `papermill` to execute notebooks
 * Can set parameter types 2 ways
     * Adding a comment, ie. `x = 34  # type: int`
     * [Python type hinting](https://docs.python.org/3/library/typing.html) (introduced in python 3.5)
+
+### Requirements.ipynb
+`requirements.ipynb` is used to install additional dependencies in the docker image
+
+It's separated into 3 sections:
+* CentOS installation (`sudo yum install <package> -y`)
+* Conda installtion (`sudo conda install <package> -y`)
+* Python library installation (`sudo pip install <package>`)
 
 ### HySDS job specs generation
 * Tag the top notebook cell with `parameters`
@@ -99,5 +109,10 @@ Usage: notebook-pge-wrapper specs [OPTIONS] NOTEBOOK_PATH
 
   ie. notebook-pge-wrapper specs <notebook_path or all>
 
-  :param notebook_path: str :return: None
+Options:
+  -s, --settings TEXT  (optional) path to settings.yml, will default to
+                       ~/.config/notebook-pge-wrapper/settings.yml if not
+                       supplied
+
+  --help               Show this message and exit.
 ```
