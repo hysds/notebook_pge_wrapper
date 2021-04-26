@@ -75,10 +75,11 @@ $ notebook-pge-wrapper create <project_name>
 The following project structure will be generated
 ```
 .
+├── Dockerfile.template
 ├── README.md
 ├── docker
 │   ├── Dockerfile
-│   └── Dockerfile.template
+│   └── requirements.ipynb
 ├── notebook_pges
 │   └── test_nb_sample_pge.ipynb
 ├── pele_setup.ipynb

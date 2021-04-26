@@ -135,7 +135,7 @@ def create(project, settings=None):
     # copy Dockerfile.template to project
     copyfile(
         os.path.join(templates, __DOCKERFILE_TEMPLATE),
-        os.path.join(project, __DOCKER_DIR, __DOCKERFILE_TEMPLATE)
+        os.path.join(project, __DOCKERFILE_TEMPLATE)
     )
 
     # copy requirements.ipynb to project
@@ -188,7 +188,7 @@ def dockerfile(settings=None):
     base_image = settings_data['base_image']
     user = settings_data['user']
 
-    docker_template = read_docker_template(os.path.join(__DOCKER_DIR, __DOCKERFILE_TEMPLATE))
+    docker_template = read_docker_template(__DOCKERFILE_TEMPLATE)
     docker_template = Template(docker_template)
     docker_template = docker_template.render(base_image=base_image, user=user, project=project_root)
 
