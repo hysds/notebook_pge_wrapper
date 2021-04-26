@@ -6,6 +6,7 @@ ENV HOME=/home/{{ user }} \
 USER root
 RUN $CONDA_DIR/bin/conda install -y nb_conda_kernels
 RUN $CONDA_DIR/bin/pip install 'ipykernel<5.0.0'
+RUN chmod 4777 $HOME
 
 USER {{ user }}
 
