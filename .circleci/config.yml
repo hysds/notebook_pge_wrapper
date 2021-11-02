@@ -13,7 +13,8 @@ jobs:
           command: |
             source $HOME/.bash_profile
             python setup.py install
-            pip install papermill
+            # while papermill is in the requirements, something odd is going on w/ the version of nbformat in this image
+            pip install papermill     
             python -m unittest
 workflows:
   version: 2
