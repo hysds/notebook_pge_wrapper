@@ -1,0 +1,41 @@
+version: 2.1
+jobs:
+  test:
+    docker:
+      - image: hysds/jupyter:latest
+        auth:
+          username: $DOCKER_USER
+          password: $DOCKER_PASS
+    steps:
+      - checkout
+      - run:
+          name: Test
+          command: |
+            source $HOME/.bash_profile
+            python setup.py install
+            pip install papermill
+            python -m unittest
+workflows:
+  version: 2
+  test:
+    jobs:
+      - test:
+          context:
+            - docker-hub-creds
+            - git-oauth-token
+  weekly:
+    triggers:
+      - schedule:
+          cron: "0 18 * * 0"
+          filters:
+            branches:
+              only:
+                - develop
+    jobs:
+      - test:
+          context:
+            - docker-hub-creds
+            - git-oauth-token
+          filters:
+            branches:
+              only: develop
