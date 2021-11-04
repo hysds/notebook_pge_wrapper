@@ -1,0 +1,42 @@
+version: 2.1
+jobs:
+  test:
+    working_directory: ~/notebook_pge_wrapper
+    docker:
+      - image: hysds/jupyter:latest
+        auth:
+          username: $DOCKER_USER
+          password: $DOCKER_PASS
+    steps:
+      - checkout
+      - run:
+          name: Test
+          command: |
+            python setup.py install
+            # while papermill is in the requirements, something odd is going on w/ the version of nbformat in this image
+            pip install papermill     
+            python -m unittest
+workflows:
+  version: 2
+  test:
+    jobs:
+      - test:
+          context:
+            - docker-hub-creds
+            - git-oauth-token
+  weekly:
+    triggers:
+      - schedule:
+          cron: "0 18 * * 0"
+          filters:
+            branches:
+              only:
+                - develop
+    jobs:
+      - test:
+          context:
+            - docker-hub-creds
+            - git-oauth-token
+          filters:
+            branches:
+              only: develop

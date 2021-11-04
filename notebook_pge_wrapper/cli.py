@@ -39,7 +39,7 @@ def settings_check():
         print('settings.yml not found, copying from library template (please revise)')
         package_root = os.path.dirname(os.path.abspath(__file__))
         copyfile(
-            os.path.join(package_root, '..', 'templates', 'settings.yml'),
+            os.path.join(package_root, 'templates', 'settings.yml'),
             os.path.join(__SETTINGS_DIR, 'settings.yml')
         )
 
@@ -101,7 +101,7 @@ def create(project, settings=None):
     docker_directory = os.path.join(project, __DOCKER_DIR)
     notebook_pges_directory = os.path.join(project, __NOTEBOOK_DIR)
 
-    templates = os.path.join(project_root, '..', 'templates')
+    templates = os.path.join(project_root, 'templates')
     readme_file = os.path.join(templates, __README_FILE)
     pge_create_notebook_file = os.path.join(templates, __PGE_CREATE_NOTEBOOK_FILE)
     submit_job_notebook_file = os.path.join(templates, __SUBMIT_JOB_NOTEBOOK_FILE)
@@ -188,7 +188,9 @@ def dockerfile(settings=None):
     base_image = settings_data['base_image']
     user = settings_data['user']
 
-    docker_template = read_docker_template(__DOCKERFILE_TEMPLATE)
+    file_root = os.path.dirname(os.path.abspath(__file__))
+    templates = os.path.join(file_root, 'templates')
+    docker_template = read_docker_template(os.path.join(templates, __DOCKERFILE_TEMPLATE))
     docker_template = Template(docker_template)
     docker_template = docker_template.render(base_image=base_image, user=user, project=project_root)
 
