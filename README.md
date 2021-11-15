@@ -1,5 +1,7 @@
 # Notebook PGE Wrapper
 
+[![CircleCI](https://circleci.com/gh/hysds/notebook_pge_wrapper/tree/develop.svg?style=svg)](https://circleci.com/gh/hysds/notebook_pge_wrapper/tree/develop)
+
 ## Related projects:
 * [Papermill Project](https://github.com/nteract/papermill)
 * [container-builder (HySDS)](https://github.com/hysds/container-builder)
